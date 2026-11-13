@@ -15,6 +15,7 @@ Web app một trang tính nhanh số ngày hưởng và tiền trợ cấp BHXH:
 - Không sửa file đó.
 - Code phải theo **đúng con số trong đặc tả**, kể cả khi tra luật thấy khác. Chỉ đổi khi anh (chủ dự án) báo khách đã đổi đặc tả.
 - Chỗ đặc tả bỏ trống (ví dụ số ngày tối đa khi tránh thai): không tự bịa số, hãy hỏi lại.
+- **Bổ sung khách đã duyệt (13/11/2026):** sinh con thứ hai từ 01/07/2026 theo CV 3923/BHXH-CĐBHXH ngày 01/07/2026 của BHXH TP Hà Nội (Luật Dân số 113/2025, NĐ 168/2026). "Con thứ hai" = tại thời điểm sinh có một con đẻ còn sống.
 
 Mọi con số nằm duy nhất trong `src/lib/bhxh/rules.ts`. Tóm tắt:
 
@@ -22,10 +23,10 @@ Mọi con số nằm duy nhất trong `src/lib/bhxh/rules.ts`. Tóm tắt:
 |---|---|---|---|
 | Ốm đau (bản thân, chăm con < 7 tuổi, bệnh dài ngày) | Ngày làm việc. Ngày nghỉ dưới nửa ngày tính 0,5. | 30/40/50 ngày/năm; nặng nhọc, độc hại 40/50/70 | `lương tháng liền kề ÷ 24 × 75% × ngày`. Bệnh dài ngày quá 180 ngày hưởng 50/55/65%. |
 | Khám thai | Ngày làm việc | 5 lần, mỗi lần ≤ 2 ngày | `BQ 6 tháng ÷ 24 × 100% × ngày` |
-| Nam nghỉ khi vợ sinh | Ngày làm việc | 5 / 7 (mổ hoặc < 32 tuần) / 10 (sinh đôi) / 14 (sinh đôi phải mổ) | `BQ ÷ 24 × ngày` |
+| Nam nghỉ khi vợ sinh | Ngày làm việc | 5 / 7 (mổ hoặc < 32 tuần) / 10 (sinh đôi, hoặc vợ sinh con thứ hai từ 01/07/2026) / 14 (sinh đôi phải mổ); sinh ba trở lên +3 ngày/con từ con thứ ba | `BQ ÷ 24 × ngày` |
 | Sảy, phá thai, thai chết lưu | Ngày liên tục | 10 / 20 / 40 / 50 ngày theo tuần tuổi thai (< 5, < 13, < 22, ≥ 22) | `BQ ÷ 24 × ngày` |
 | Tránh thai | Ngày liên tục | Không có trần trong đặc tả | `BQ ÷ 24 × ngày` |
-| Sinh con | Ngày liên tục | 6 tháng, thêm 1 tháng/con từ con thứ 2 | `BQ × số tháng` |
+| Sinh con | Ngày liên tục | 6 tháng (7 tháng nếu sinh con thứ hai từ 01/07/2026), thêm 1 tháng/con từ con thứ 2 cùng lần sinh; nghỉ trước sinh ≤ 2 tháng | `BQ × số tháng` |
 | Dưỡng sức | Ngày liên tục, nghỉ trong 30 ngày đầu sau khi đi làm lại | Sau ốm: 10 (dài ngày) / 7 (phẫu thuật) / 5 (khác). Sau thai sản: 10 (từ 2 con) / 7 (sinh mổ) / 5 (khác) | `2.340.000 × 30% × ngày` (702.000 đ/ngày) |
 
 Viết tắt: BQ = bình quân tiền lương đóng BHXH 6 tháng liền kề.
@@ -46,7 +47,7 @@ src/components/ui|form/    UI kit port từ portal-sales-pharmacy
 
 - UI kết quả chỉ đọc `CalcResult`, không tự tính lại.
 - Lương (tháng liền kề / BQ 6 tháng) là **tùy chọn** theo phản hồi của khách: thiếu lương vẫn trả `CalcResult` đầy đủ số ngày, `withoutMoney()` bỏ phần tiền và gắn `moneyMissing`.
-- Ngày nghỉ hằng tuần là danh sách thứ tùy chọn (`WeeklyRest = number[]`, 0 = CN … 6 = T7). Mặc định `[0]`; đơn vị có thể nghỉ cả ngày thường, ví dụ Thứ 4.
+- Ngày nghỉ hằng tuần là danh sách thứ (`WeeklyRest = number[]`, 0 = CN … 6 = T7). UI theo yêu cầu khách: 3 thẻ "Chủ nhật" / "Thứ 7 & Chủ nhật" / "Ngày nghỉ khác" (mới hiện 7 nút chọn thứ).
 - Ngày truyền đi dạng chuỗi ISO `yyyy-MM-dd`.
 - Tiền là số nguyên đồng (`Math.round` ở từng dòng).
 
