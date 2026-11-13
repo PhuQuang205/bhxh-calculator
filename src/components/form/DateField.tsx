@@ -44,7 +44,7 @@ function displayToIso(display: string): string | null {
 }
 
 /** Ô ngày gõ được `dd/mm/yyyy` (tự chèn dấu "/") và có nút mở lịch. */
-export function DateField({ value, onValueChange, highlighted, className, id, ...props }: DateFieldProps) {
+export function DateField({ value, onValueChange, highlighted, className, id, placeholder, ...props }: DateFieldProps) {
   const [draft, setDraft] = React.useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const selected = value ? parseISO(value) : undefined;
@@ -57,8 +57,8 @@ export function DateField({ value, onValueChange, highlighted, className, id, ..
   return (
     <>
       <Input
-        placeholder="dd/mm/yyyy"
         {...props}
+        placeholder={placeholder ?? "dd/mm/yyyy"}
         id={id}
         type="text"
         inputMode="numeric"
