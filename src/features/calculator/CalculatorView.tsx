@@ -88,22 +88,22 @@ export function CalculatorView() {
 
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div className="flex flex-col gap-5 lg:col-span-5">
-            <div className="flex items-end justify-between gap-4">
-              <h1 className="text-[34px] leading-[1.1] tracking-tight sm:text-[44px]">
-                <span className="block font-semibold">Tính chế độ</span>
-                <span className="block font-light">Bảo hiểm xã hội</span>
-              </h1>
-              <button
-                type="button"
-                onClick={() => dispatch({ type: "reset" })}
-                className="mb-1 inline-flex h-10 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium text-muted-foreground outline-hidden hover:bg-card hover:text-foreground focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ring"
-              >
-                <RotateCcw aria-hidden className="size-4" /> Làm mới
-              </button>
-            </div>
+            <h1 className="sr-only">Tính chế độ bảo hiểm xã hội</h1>
 
             <Card className="flex flex-col gap-1 rounded-2xl p-5 sm:p-6 lg:sticky lg:top-6">
-              <FormSection step={1} title="Chế độ & trường hợp">
+              <FormSection
+                step={1}
+                title="Chế độ & trường hợp"
+                action={
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: "reset" })}
+                    className="-my-2 inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs font-medium text-muted-foreground outline-hidden hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ring"
+                  >
+                    <RotateCcw aria-hidden className="size-3.5" /> Làm mới
+                  </button>
+                }
+              >
                 {state.mode === "sickness" ? <SicknessKindField value={state.sickness.kind} dispatch={dispatch} /> : null}
                 {state.mode === "maternity" ? <MaternityKindField value={state.maternity.kind} dispatch={dispatch} /> : null}
                 {state.mode === "recovery" ? <RecoveryAfterField value={state.recovery.after} dispatch={dispatch} /> : null}

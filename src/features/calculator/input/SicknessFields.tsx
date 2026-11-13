@@ -4,7 +4,7 @@ import { FieldSet } from "@/components/form/FieldSet";
 import { Stepper } from "@/components/form/Stepper";
 import { RadioCards } from "@/components/ui/radio-cards";
 import { SwitchField } from "@/components/ui/switch";
-import { CONTRIBUTION_LABEL, SICKNESS, type ContributionTier } from "@/lib/bhxh/rules";
+import { CONTRIBUTION_LABEL, type ContributionTier } from "@/lib/bhxh/rules";
 import { SICKNESS_KIND_LABEL } from "@/lib/bhxh/sickness";
 import type { SicknessInput, SicknessKind } from "@/lib/bhxh/inputs";
 
@@ -12,10 +12,10 @@ import type { Action } from "../state";
 
 import { LongTermDiseaseLookup } from "./LongTermDiseaseLookup";
 
-const KINDS: { value: SicknessKind; label: string; description: string }[] = [
-  { value: "self", label: SICKNESS_KIND_LABEL.self, description: "Nghỉ theo chỉ định y tế" },
-  { value: "child", label: SICKNESS_KIND_LABEL.child, description: "Nghỉ để chăm sóc con ốm" },
-  { value: "longterm", label: "Bệnh dài ngày", description: "Thuộc danh mục bệnh cần chữa trị dài ngày" },
+const KINDS: { value: SicknessKind; label: string }[] = [
+  { value: "self", label: SICKNESS_KIND_LABEL.self },
+  { value: "child", label: SICKNESS_KIND_LABEL.child },
+  { value: "longterm", label: "Bệnh dài ngày" },
 ];
 
 const TIERS = (Object.keys(CONTRIBUTION_LABEL) as ContributionTier[]).map((value) => ({
@@ -41,7 +41,6 @@ export function SicknessKindField({ value, dispatch }: { value: SicknessKind; di
 
 export function SicknessFields({ input, dispatch }: { input: SicknessInput; dispatch: React.Dispatch<Action> }) {
   const set = (patch: Partial<SicknessInput>) => dispatch({ type: "sickness", patch });
-  const cap = (input.heavyWork ? SICKNESS.capHeavy : SICKNESS.capNormal)[input.contribution];
   return (
     <>
       {input.kind === "longterm" ? <LongTermDiseaseLookup /> : null}
@@ -60,7 +59,6 @@ export function SicknessFields({ input, dispatch }: { input: SicknessInput; disp
       <SwitchField
         id="heavy-work"
         label="Nghề, công việc nặng nhọc, độc hại"
-        description={`Trần ngày hưởng hiện tại: ${cap} ngày/năm`}
         checked={input.heavyWork}
         onCheckedChange={(heavyWork) => set({ heavyWork })}
         className="mb-6"

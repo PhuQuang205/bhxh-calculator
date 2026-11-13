@@ -65,9 +65,6 @@ export function HolidayPanel({ state, dispatch }: HolidayPanelProps) {
           <div className="flex items-start justify-between gap-4 p-6 pb-3">
             <div className="flex flex-col gap-1">
               <Dialog.Title className="text-lg leading-6 font-semibold">Ngày nghỉ lễ, Tết</Dialog.Title>
-              <Dialog.Description className="text-sm leading-5 text-muted-foreground">
-                Dùng để trừ khi tính theo ngày làm việc. Bỏ chọn ngày đơn vị không nghỉ, thêm ngày nghỉ Tết hoặc nghỉ bù riêng.
-              </Dialog.Description>
             </div>
             <Dialog.Close aria-label="Đóng" className="grid size-10 shrink-0 cursor-pointer place-items-center rounded-full bg-muted outline-hidden hover:bg-border-subtle focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ring">
               <X aria-hidden className="size-5" />

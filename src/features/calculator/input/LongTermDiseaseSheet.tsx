@@ -7,7 +7,6 @@ import { ListChecks, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   LONG_TERM_DISEASES,
-  LONG_TERM_DISEASE_COUNT,
   LONG_TERM_DISEASE_SOURCE,
   LONG_TERM_GROUPS,
   searchLongTermDiseases,
@@ -47,7 +46,7 @@ export function LongTermDiseaseSheet({ trigger = "pill" }: { trigger?: keyof typ
               <div className="flex flex-col gap-1">
                 <Dialog.Title className="text-lg leading-6 font-semibold">Danh mục bệnh cần chữa trị dài ngày</Dialog.Title>
                 <Dialog.Description className="text-sm leading-5 text-muted-foreground">
-                  {LONG_TERM_DISEASE_COUNT} bệnh, {LONG_TERM_DISEASE_SOURCE}. Mã 3 ký tự bao gồm cả các mã con.
+                  {LONG_TERM_DISEASE_SOURCE}
                 </Dialog.Description>
               </div>
               <Dialog.Close
@@ -71,7 +70,7 @@ export function LongTermDiseaseSheet({ trigger = "pill" }: { trigger?: keyof typ
           <div aria-live="polite" className="flex-1 overflow-y-auto px-6 pb-6">
             {groups.length === 0 ? (
               <p className="rounded-lg bg-muted px-4 py-3 text-sm leading-5 text-muted-foreground">
-                Không thấy trong danh mục. Thử tìm theo mã ICD-10 ghi trên giấy ra viện hoặc giấy nghỉ ốm.
+                Không có trong danh mục.
               </p>
             ) : (
               groups.map(({ group, items }) => (

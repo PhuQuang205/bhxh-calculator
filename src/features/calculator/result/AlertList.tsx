@@ -10,7 +10,9 @@ const TONE: Record<AlertLevel, { box: string; Icon: typeof Info }> = {
   danger: { box: "border-status-danger-border bg-status-danger-bg text-status-danger-fg", Icon: OctagonAlert },
 };
 
-export function AlertList({ alerts }: { alerts: readonly CalcAlert[] }) {
+export function AlertList({ alerts: all }: { alerts: readonly CalcAlert[] }) {
+  // Bỏ dòng "đủ điều kiện" màu xanh: không có cảnh báo nghĩa là hợp lệ.
+  const alerts = all.filter((alert) => alert.level !== "ok");
   if (alerts.length === 0) return null;
   return (
     <ul aria-label="Kiểm tra điều kiện" className="flex flex-col gap-2">

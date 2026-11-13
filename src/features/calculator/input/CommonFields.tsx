@@ -5,15 +5,15 @@ import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
 import { Input } from "@/components/ui/input";
 import { RadioCards } from "@/components/ui/radio-cards";
-import { WeekdayPicker, describeWeeklyRest } from "@/components/ui/weekday-picker";
+import { WeekdayPicker } from "@/components/ui/weekday-picker";
 import type { DayRule, ISODate } from "@/lib/bhxh/types";
 
 import { WEEKLY_REST_PRESETS, type Action, type CalculatorState, type WeeklyRestPreset } from "../state";
 
-const PRESETS: { value: WeeklyRestPreset; label: string; description: string }[] = [
-  { value: "sun", label: "Chủ nhật", description: "Làm việc Thứ 2 – Thứ 7" },
-  { value: "sat-sun", label: "Thứ 7 & Chủ nhật", description: "Làm việc Thứ 2 – Thứ 6" },
-  { value: "custom", label: "Ngày nghỉ khác", description: "Tự chọn thứ nghỉ trong tuần" },
+const PRESETS: { value: WeeklyRestPreset; label: string }[] = [
+  { value: "sun", label: "Chủ nhật" },
+  { value: "sat-sun", label: "Thứ 7 & Chủ nhật" },
+  { value: "custom", label: "Ngày nghỉ khác" },
 ];
 
 interface CommonFieldsProps {
@@ -69,7 +69,6 @@ export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd 
           <FieldSet
             id="weekly-rest"
             label="Lịch nghỉ hằng tuần của đơn vị"
-            hint={state.weeklyRestPreset === "custom" ? undefined : describeWeeklyRest(state.weeklyRest)}
           >
             {(labelId) => (
               <RadioCards
@@ -90,7 +89,7 @@ export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd 
             )}
           </FieldSet>
           {state.weeklyRestPreset === "custom" ? (
-            <FieldSet id="weekly-rest-days" label="Chọn các thứ đơn vị nghỉ (bấm để bật/tắt)" hint={describeWeeklyRest(state.weeklyRest)}>
+            <FieldSet id="weekly-rest-days" label="Chọn các thứ nghỉ">
               {(labelId) => (
                 <WeekdayPicker
                   aria-labelledby={labelId}

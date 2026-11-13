@@ -68,7 +68,7 @@ function SecondChildFields({ input, set, father }: { input: MaternityInput; set:
       <SwitchField
         id="second-child"
         label={father ? "Vợ sinh con thứ hai" : "Sinh con thứ hai"}
-        description={`Tại thời điểm sinh ${father ? "người vợ " : ""}có một con đẻ còn sống. Áp dụng khi sinh từ 01/07/2026.`}
+        description={`${father ? "Vợ đang" : "Đang"} có một con đẻ còn sống, sinh từ 01/07/2026`}
         checked={input.secondChild}
         onCheckedChange={(secondChild) => set({ secondChild })}
         className="mb-6"
@@ -76,7 +76,6 @@ function SecondChildFields({ input, set, father }: { input: MaternityInput; set:
       <Field label={father ? "Ngày vợ sinh con (tùy chọn)" : "Ngày sinh con (tùy chọn)"} htmlFor="birth-date">
         <DateField id="birth-date" value={input.birthDate} onValueChange={(birthDate) => set({ birthDate })} />
       </Field>
-      <p className="-mt-5 mb-4 text-xs leading-5 text-muted-foreground">Bỏ trống thì lấy ngày bắt đầu nghỉ làm ngày sinh.</p>
     </>
   );
 }
@@ -141,7 +140,6 @@ export function MaternityFields({ input, dispatch, start }: MaternityFieldsProps
             <SwitchField
               id="wife-preterm"
               label="Vợ sinh con dưới 32 tuần tuổi"
-              description="Được nghỉ như trường hợp sinh mổ"
               checked={input.wifePreterm}
               onCheckedChange={(wifePreterm) => set({ wifePreterm })}
               className="mb-6"

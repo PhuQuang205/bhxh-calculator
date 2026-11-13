@@ -4,7 +4,7 @@ import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
 import { RadioCards } from "@/components/ui/radio-cards";
-import { RECOVERY_CASE_LABEL, recoveryCap } from "@/lib/bhxh/recovery";
+import { RECOVERY_CASE_LABEL } from "@/lib/bhxh/recovery";
 import { RECOVERY } from "@/lib/bhxh/rules";
 import type { RecoveryAfter, RecoveryCase, RecoveryInput } from "@/lib/bhxh/inputs";
 
@@ -41,7 +41,7 @@ export function RecoveryFields({ input, dispatch }: { input: RecoveryInput; disp
   }));
   return (
     <>
-      <FieldSet id="recovery-case" label="Chi tiết trường hợp" hint={`Tối đa ${recoveryCap(input)} ngày`}>
+      <FieldSet id="recovery-case" label="Chi tiết trường hợp">
         {(labelId) => (
           <RadioCards aria-labelledby={labelId} columns={1} options={options} value={input.caseKind} onValueChange={(caseKind) => set({ caseKind })} />
         )}
