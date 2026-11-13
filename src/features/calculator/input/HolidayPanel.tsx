@@ -52,7 +52,7 @@ export function HolidayPanel({ state, dispatch }: HolidayPanelProps) {
 
   return (
     <Dialog.Root>
-      <Dialog.Trigger className="relative inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-card px-4 text-sm leading-5 font-medium shadow-soft outline-hidden transition-colors duration-100 hover:bg-primary-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ring motion-reduce:transition-none">
+      <Dialog.Trigger className="relative inline-flex h-11 cursor-pointer items-center gap-2 rounded-full whitespace-nowrap bg-card px-4 text-sm leading-5 font-medium shadow-soft outline-hidden transition-colors duration-100 hover:bg-primary-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ring motion-reduce:transition-none">
         <CalendarCog aria-hidden className="size-4 text-primary" />
         Lịch nghỉ lễ
         {changed > 0 ? (

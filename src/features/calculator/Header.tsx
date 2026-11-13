@@ -28,7 +28,7 @@ function Logo() {
           />
         ))}
       </svg>
-      <span className="text-lg leading-6 font-semibold tracking-tight">BHXH Nhanh</span>
+      <span className="text-lg leading-6 font-semibold tracking-tight whitespace-nowrap">BHXH Nhanh</span>
     </div>
   );
 }
@@ -42,9 +42,9 @@ interface HeaderProps {
 export function Header({ mode, onModeChange, holidayButton }: HeaderProps) {
   return (
     <header className="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Logo />
-        <div className="lg:hidden">{holidayButton}</div>
+        <div className="flex gap-2 lg:hidden">{holidayButton}</div>
       </div>
 
       <Tabs value={mode} onValueChange={(value) => onModeChange(value as Mode)}>

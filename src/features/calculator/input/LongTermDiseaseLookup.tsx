@@ -4,12 +4,14 @@ import * as React from "react";
 
 import { Field } from "@/components/form/Field";
 import { Input } from "@/components/ui/input";
-import { LONG_TERM_DISEASE_COUNT, searchLongTermDiseases } from "@/lib/bhxh/longTermDiseases";
+import { LONG_TERM_DISEASE_COUNT, LONG_TERM_DISEASE_SOURCE, searchLongTermDiseases } from "@/lib/bhxh/longTermDiseases";
+
+import { LongTermDiseaseSheet } from "./LongTermDiseaseSheet";
 
 /** Tra cứu Phụ lục I – Danh mục bệnh cần chữa trị dài ngày. Chỉ để đối chiếu, không ảnh hưởng kết quả tính. */
 export function LongTermDiseaseLookup() {
   const [query, setQuery] = React.useState("");
-  const results = React.useMemo(() => searchLongTermDiseases(query), [query]);
+  const results = React.useMemo(() => searchLongTermDiseases(query, 8), [query]);
   const hasQuery = query.trim().length > 0;
 
   return (
@@ -28,7 +30,8 @@ export function LongTermDiseaseLookup() {
       <div aria-live="polite" className="-mt-1">
         {!hasQuery ? (
           <p className="text-xs leading-5 text-muted-foreground">
-            {LONG_TERM_DISEASE_COUNT} bệnh theo Phụ lục I. Mã 3 ký tự (ví dụ D16) bao gồm cả các mã con (D16.0 … D16.9).
+            {LONG_TERM_DISEASE_COUNT} bệnh theo {LONG_TERM_DISEASE_SOURCE}. Mã 3 ký tự (ví dụ D16) bao gồm cả các mã con (D16.0 … D16.9).{" "}
+            <LongTermDiseaseSheet trigger="link" />
           </p>
         ) : results.length === 0 ? (
           <p className="rounded-lg bg-muted px-4 py-3 text-sm leading-5 text-muted-foreground">

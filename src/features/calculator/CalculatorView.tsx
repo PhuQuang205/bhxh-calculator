@@ -16,6 +16,7 @@ import { Header } from "./Header";
 import { CommonFields } from "./input/CommonFields";
 import { FormSection } from "./input/FormSection";
 import { HolidayPanel } from "./input/HolidayPanel";
+import { LongTermDiseaseSheet } from "./input/LongTermDiseaseSheet";
 import { MaternityFields, MaternityKindField } from "./input/MaternityFields";
 import { RecoveryAfterField, RecoveryFields } from "./input/RecoveryFields";
 import { SicknessFields, SicknessKindField } from "./input/SicknessFields";
@@ -73,7 +74,12 @@ export function CalculatorView() {
     }
   };
 
-  const holidayButton = <HolidayPanel state={state} dispatch={dispatch} />;
+  const holidayButton = (
+    <>
+      <LongTermDiseaseSheet />
+      <HolidayPanel state={state} dispatch={dispatch} />
+    </>
+  );
 
   return (
     <>
