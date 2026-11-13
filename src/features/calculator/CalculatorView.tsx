@@ -77,7 +77,7 @@ export function CalculatorView() {
 
   return (
     <>
-      <div className="no-print mx-auto flex w-full max-w-[1360px] flex-col gap-6 px-4 pt-5 pb-28 sm:px-6 lg:gap-8 lg:px-8 lg:pt-8 lg:pb-12">
+      <div className="no-print flex w-full flex-col gap-6 px-4 pt-5 pb-28 sm:px-6 lg:gap-8 lg:px-10 lg:pt-8 lg:pb-12">
         <Header mode={state.mode} onModeChange={(mode) => dispatch({ type: "set", patch: { mode } })} holidayButton={holidayButton} />
 
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">

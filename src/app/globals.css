@@ -74,6 +74,11 @@
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    /* Ẩn thanh cuộn mặc định của trang, vẫn cuộn bằng chuột/cảm ứng. */
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
   }
   body {
     @apply bg-background text-foreground;
