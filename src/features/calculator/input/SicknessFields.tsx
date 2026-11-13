@@ -1,8 +1,6 @@
 "use client";
 
-import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
-import { MoneyInput } from "@/components/form/MoneyInput";
 import { Stepper } from "@/components/form/Stepper";
 import { RadioCards } from "@/components/ui/radio-cards";
 import { SwitchField } from "@/components/ui/switch";
@@ -83,12 +81,6 @@ export function SicknessFields({ input, dispatch }: { input: SicknessInput; disp
         </FieldSet>
       </div>
 
-      <p className="-mb-1 text-xs leading-4 text-muted-foreground">
-        Không bắt buộc: bỏ trống vẫn ra số ngày hưởng. Nhập thêm lương để ước tính tiền.
-      </p>
-      <Field label="Tiền lương đóng BHXH tháng liền kề (tùy chọn)" htmlFor="salary">
-        <MoneyInput id="salary" size="lg" placeholder="Ví dụ 8.000.000" value={input.salary} onValueChange={(salary) => set({ salary })} />
-      </Field>
     </>
   );
 }

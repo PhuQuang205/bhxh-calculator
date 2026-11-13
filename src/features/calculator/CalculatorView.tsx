@@ -5,7 +5,6 @@ import { parseISO } from "date-fns";
 import { ArrowDown, RotateCcw } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
-import { formatMoney } from "@/lib/format";
 import { mergeHolidays } from "@/lib/bhxh/holidays";
 import { birthEntitledEnd, calculateMaternity, effectiveBirthDate, maternityRule } from "@/lib/bhxh/maternity";
 import type { PeriodContext } from "@/lib/bhxh/period";
@@ -114,10 +113,10 @@ export function CalculatorView() {
                 />
               </FormSection>
 
-              <FormSection step={3} title="Chi tiết & tiền lương">
+              <FormSection step={3} title="Chi tiết">
                 {state.mode === "sickness" ? <SicknessFields input={state.sickness} dispatch={dispatch} /> : null}
                 {state.mode === "maternity" ? <MaternityFields input={state.maternity} dispatch={dispatch} start={state.start} /> : null}
-                {state.mode === "recovery" ? <RecoveryFields input={state.recovery} dispatch={dispatch} start={state.start} /> : null}
+                {state.mode === "recovery" ? <RecoveryFields input={state.recovery} dispatch={dispatch} /> : null}
               </FormSection>
             </Card>
           </div>
@@ -137,10 +136,10 @@ export function CalculatorView() {
         >
           <span className="flex flex-col items-start">
             <span className="text-xs leading-4 text-white/70">
-              {outcome.moneyMissing ? "Số ngày được hưởng" : "Tiền trợ cấp ước tính"}
+              Số ngày được hưởng
             </span>
             <span className="text-lg leading-6 font-semibold tabular-nums">
-              {outcome.moneyMissing ? benefitText(outcome) : formatMoney(outcome.total)}
+              {benefitText(outcome)}
             </span>
           </span>
           <span className="grid size-12 place-items-center rounded-full bg-white text-ink">

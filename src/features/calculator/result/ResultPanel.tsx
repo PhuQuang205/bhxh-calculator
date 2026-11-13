@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { isPending, type CalcOutcome } from "@/lib/bhxh/types";
 
 import { AlertList } from "./AlertList";
-import { AllowanceCard } from "./AllowanceCard";
 import { CapRing } from "./CapRing";
 import { DayBreakdownCard } from "./DayBreakdownCard";
 import { RuleBadge } from "./RuleBadge";
@@ -67,11 +66,8 @@ export function ResultPanel({ outcome, title, copied, onCopy, onPrint }: ResultP
             ) : null}
           </div>
 
-          <div className="grid gap-4 md:grid-cols-5">
-            <div className="md:col-span-3">
-              <AllowanceCard total={outcome.total} lines={outcome.lines} moneyMissing={outcome.moneyMissing} copied={copied} onCopy={onCopy} />
-            </div>
-            <Card className="flex flex-col justify-between gap-4 rounded-2xl p-5 md:col-span-2 lg:p-6">
+          <Card className="flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center sm:justify-between lg:p-6">
+            <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-1">
                 <span className="text-xs leading-4 text-muted-foreground">Trường hợp</span>
                 <span className="text-base leading-6 font-semibold">{title}</span>
@@ -81,17 +77,17 @@ export function ResultPanel({ outcome, title, copied, onCopy, onPrint }: ResultP
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-              <div className="flex flex-col gap-2">
-                <Button variant="secondary" surface="card" onClick={onCopy}>
-                  {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
-                  {copied ? "Đã sao chép" : "Sao chép kết quả"}
-                </Button>
-                <Button variant="secondary" surface="card" onClick={onPrint}>
-                  <Printer aria-hidden /> In / Xuất PDF
-                </Button>
-              </div>
-            </Card>
-          </div>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:w-56">
+              <Button variant="secondary" surface="card" onClick={onCopy}>
+                {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+                {copied ? "Đã sao chép" : "Sao chép kết quả"}
+              </Button>
+              <Button variant="secondary" surface="card" onClick={onPrint}>
+                <Printer aria-hidden /> In / Xuất PDF
+              </Button>
+            </div>
+          </Card>
 
           <AlertList alerts={outcome.alerts} />
         </>

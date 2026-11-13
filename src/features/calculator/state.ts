@@ -43,7 +43,6 @@ export const initialState: CalculatorState = {
     halfDays: 0,
     leaveOverlap: 0,
     usedDays: 0,
-    salary: null,
   },
   maternity: {
     kind: "birth",
@@ -54,7 +53,6 @@ export const initialState: CalculatorState = {
     birthDate: null,
     wifeBirth: "normal",
     wifePreterm: false,
-    avgSalary: null,
   },
   recovery: {
     after: "sickness",

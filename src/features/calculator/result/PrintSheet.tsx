@@ -1,6 +1,5 @@
 import { format } from "date-fns";
 
-import { formatMoney } from "@/lib/format";
 import type { CalcResult } from "@/lib/bhxh/types";
 
 import type { CalculatorState } from "../state";
@@ -46,35 +45,6 @@ export function PrintSheet({ state, result }: { state: CalculatorState; result: 
           ))}
         </ul>
       ) : null}
-
-      {result.moneyMissing ? (
-        <p className="mb-4 text-[11pt] italic">Tiền trợ cấp: chưa tính (chưa nhập {result.moneyMissing.toLowerCase()}).</p>
-      ) : (
-        <table className="mb-4 w-full border-collapse text-[11pt]">
-        <thead>
-          <tr>
-            <th className="border border-black px-2 py-1 text-left">Khoản</th>
-            <th className="border border-black px-2 py-1 text-left">Công thức</th>
-            <th className="border border-black px-2 py-1 text-right">Số tiền</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result.lines.map((line) => (
-            <tr key={line.label}>
-              <td className="border border-black px-2 py-1">{line.label}</td>
-              <td className="border border-black px-2 py-1">{line.formula}</td>
-              <td className="border border-black px-2 py-1 text-right whitespace-nowrap">{formatMoney(line.amount)}</td>
-            </tr>
-          ))}
-          <tr>
-            <td colSpan={2} className="border border-black px-2 py-1 font-bold">
-              Tổng cộng
-            </td>
-            <td className="border border-black px-2 py-1 text-right font-bold whitespace-nowrap">{formatMoney(result.total)}</td>
-          </tr>
-        </tbody>
-      </table>
-      )}
 
       {result.alerts.some((a) => a.level !== "ok") ? (
         <div className="mb-4 text-[10pt]">

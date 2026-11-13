@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns";
 
-import { formatDays, formatMoney } from "@/lib/format";
+import { formatDays } from "@/lib/format";
 import { MATERNITY_KIND_LABEL } from "@/lib/bhxh/maternity";
 import { RECOVERY_CASE_LABEL } from "@/lib/bhxh/recovery";
 import { SICKNESS_KIND_LABEL } from "@/lib/bhxh/sickness";
@@ -44,12 +44,7 @@ export function buildCopyText(state: CalculatorState, result: CalcResult): strin
     `Thời gian nghỉ: ${periodText(result)} (${result.calendarDays} ngày theo lịch)`,
     `Cách tính: ${rule}`,
     ...result.deductions.map((line) => `  • ${line}`),
-    `Số ngày hưởng: ${benefitText(result)}`,
-    "",
-    ...result.lines.map((line) => `${line.label}: ${formatMoney(line.amount)}\n  = ${line.formula}`),
-    result.moneyMissing
-      ? `Tiền trợ cấp: chưa tính (chưa nhập ${result.moneyMissing.toLowerCase()})`
-      : `TỔNG TRỢ CẤP: ${formatMoney(result.total)}`,
+    `SỐ NGÀY ĐƯỢC HƯỞNG: ${benefitText(result)}`,
     "",
     ...result.alerts.filter((a) => a.level !== "ok").map((a) => `⚠ ${a.text}`),
     "Căn cứ: Luật BHXH 41/2024/QH15. Số liệu chỉ để tham khảo.",
