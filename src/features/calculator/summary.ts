@@ -47,7 +47,9 @@ export function buildCopyText(state: CalculatorState, result: CalcResult): strin
     `Số ngày hưởng: ${benefitText(result)}`,
     "",
     ...result.lines.map((line) => `${line.label}: ${formatMoney(line.amount)}\n  = ${line.formula}`),
-    `TỔNG TRỢ CẤP: ${formatMoney(result.total)}`,
+    result.moneyMissing
+      ? `Tiền trợ cấp: chưa tính (chưa nhập ${result.moneyMissing.toLowerCase()})`
+      : `TỔNG TRỢ CẤP: ${formatMoney(result.total)}`,
     "",
     ...result.alerts.filter((a) => a.level !== "ok").map((a) => `⚠ ${a.text}`),
     "Căn cứ: Luật BHXH 41/2024/QH15. Số liệu chỉ để tham khảo.",

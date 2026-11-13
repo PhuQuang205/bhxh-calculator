@@ -47,7 +47,10 @@ export function PrintSheet({ state, result }: { state: CalculatorState; result: 
         </ul>
       ) : null}
 
-      <table className="mb-4 w-full border-collapse text-[11pt]">
+      {result.moneyMissing ? (
+        <p className="mb-4 text-[11pt] italic">Tiền trợ cấp: chưa tính (chưa nhập {result.moneyMissing.toLowerCase()}).</p>
+      ) : (
+        <table className="mb-4 w-full border-collapse text-[11pt]">
         <thead>
           <tr>
             <th className="border border-black px-2 py-1 text-left">Khoản</th>
@@ -71,6 +74,7 @@ export function PrintSheet({ state, result }: { state: CalculatorState; result: 
           </tr>
         </tbody>
       </table>
+      )}
 
       {result.alerts.some((a) => a.level !== "ok") ? (
         <div className="mb-4 text-[10pt]">

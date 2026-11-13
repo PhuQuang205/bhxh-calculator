@@ -23,7 +23,7 @@ import { SicknessFields, SicknessKindField } from "./input/SicknessFields";
 import { PrintSheet } from "./result/PrintSheet";
 import { ResultPanel } from "./result/ResultPanel";
 import { initialState, reducer, type CalculatorState } from "./state";
-import { buildCopyText, caseTitle } from "./summary";
+import { benefitText, buildCopyText, caseTitle } from "./summary";
 
 function ruleOf(state: CalculatorState): DayRule {
   if (state.mode === "sickness") return "working";
@@ -139,8 +139,12 @@ export function CalculatorView() {
           className="no-print fixed inset-x-4 bottom-4 z-30 flex h-16 cursor-pointer items-center justify-between rounded-full bg-ink pr-2 pl-6 text-white shadow-soft outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ring lg:hidden"
         >
           <span className="flex flex-col items-start">
-            <span className="text-xs leading-4 text-white/70">Tiền trợ cấp ước tính</span>
-            <span className="text-lg leading-6 font-semibold tabular-nums">{formatMoney(outcome.total)}</span>
+            <span className="text-xs leading-4 text-white/70">
+              {outcome.moneyMissing ? "Số ngày được hưởng" : "Tiền trợ cấp ước tính"}
+            </span>
+            <span className="text-lg leading-6 font-semibold tabular-nums">
+              {outcome.moneyMissing ? benefitText(outcome) : formatMoney(outcome.total)}
+            </span>
           </span>
           <span className="grid size-12 place-items-center rounded-full bg-white text-ink">
             <ArrowDown aria-hidden className="size-5" />

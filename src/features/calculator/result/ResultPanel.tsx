@@ -69,7 +69,7 @@ export function ResultPanel({ outcome, title, copied, onCopy, onPrint }: ResultP
 
           <div className="grid gap-4 md:grid-cols-5">
             <div className="md:col-span-3">
-              <AllowanceCard total={outcome.total} lines={outcome.lines} copied={copied} onCopy={onCopy} />
+              <AllowanceCard total={outcome.total} lines={outcome.lines} moneyMissing={outcome.moneyMissing} copied={copied} onCopy={onCopy} />
             </div>
             <Card className="flex flex-col justify-between gap-4 rounded-2xl p-5 md:col-span-2 lg:p-6">
               <div className="flex flex-col gap-1">

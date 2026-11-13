@@ -111,7 +111,10 @@ export function MaternityFields({ input, dispatch }: { input: MaternityInput; di
         </>
       ) : null}
 
-      <Field label="Bình quân tiền lương đóng BHXH 6 tháng liền kề" htmlFor="avg-salary">
+      <p className="-mb-1 text-xs leading-4 text-muted-foreground">
+        Không bắt buộc: bỏ trống vẫn ra số ngày hưởng. Nhập thêm lương để ước tính tiền.
+      </p>
+      <Field label="Bình quân tiền lương đóng BHXH 6 tháng liền kề (tùy chọn)" htmlFor="avg-salary">
         <MoneyInput id="avg-salary" size="lg" placeholder="Ví dụ 9.600.000" value={input.avgSalary} onValueChange={(avgSalary) => set({ avgSalary })} />
       </Field>
     </>

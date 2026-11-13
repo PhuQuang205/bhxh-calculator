@@ -6,8 +6,8 @@ import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
 import { Input } from "@/components/ui/input";
-import { RadioCards } from "@/components/ui/radio-cards";
-import type { DayRule, ISODate, WeeklyRest } from "@/lib/bhxh/types";
+import { WeekdayPicker, describeWeeklyRest } from "@/components/ui/weekday-picker";
+import type { DayRule, ISODate } from "@/lib/bhxh/types";
 
 import type { Action, CalculatorState } from "../state";
 
@@ -19,11 +19,6 @@ interface CommonFieldsProps {
   /** Sinh con: ngày kết thúc tự tính, ô kết thúc thành tùy chọn. */
   entitledEnd?: ISODate | null;
 }
-
-const WEEKLY_REST: { value: WeeklyRest; label: string; description: string }[] = [
-  { value: "sun", label: "Chủ nhật", description: "Làm việc Thứ 2 – Thứ 7" },
-  { value: "sat-sun", label: "Thứ 7 & Chủ nhật", description: "Làm việc Thứ 2 – Thứ 6" },
-];
 
 export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd }: CommonFieldsProps) {
   const endError = state.start && state.end && state.end < state.start ? "Ngày kết thúc phải sau ngày bắt đầu" : undefined;
@@ -66,11 +61,10 @@ export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd 
       </div>
 
       {rule === "working" ? (
-        <FieldSet id="weekly-rest" label="Lịch nghỉ hằng tuần của đơn vị">
+        <FieldSet id="weekly-rest" label="Ngày nghỉ hằng tuần của đơn vị (bấm để chọn)" hint={describeWeeklyRest(state.weeklyRest)}>
           {(labelId) => (
-            <RadioCards
+            <WeekdayPicker
               aria-labelledby={labelId}
-              options={WEEKLY_REST}
               value={state.weeklyRest}
               onValueChange={(weeklyRest) => dispatch({ type: "set", patch: { weeklyRest } })}
             />

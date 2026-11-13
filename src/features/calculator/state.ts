@@ -23,7 +23,7 @@ export const initialState: CalculatorState = {
   fullName: "",
   start: null,
   end: null,
-  weeklyRest: "sun",
+  weeklyRest: [0],
   customHolidays: {},
   removedHolidays: [],
   sickness: {
