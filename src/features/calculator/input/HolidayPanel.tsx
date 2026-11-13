@@ -61,8 +61,8 @@ export function HolidayPanel({ state, dispatch }: HolidayPanelProps) {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/30 transition-opacity duration-150 data-ending-style:opacity-0 data-starting-style:opacity-0" />
-        <Dialog.Popup className="fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col overflow-hidden rounded-t-2xl bg-card shadow-soft outline-hidden transition-[translate,opacity] duration-200 data-ending-style:translate-y-8 data-ending-style:opacity-0 data-starting-style:translate-y-8 data-starting-style:opacity-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:w-[560px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
-          <div className="flex items-start justify-between gap-4 p-5 pb-3">
+        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col overflow-hidden bg-card shadow-soft outline-hidden transition-transform duration-300 ease-out data-ending-style:translate-x-full data-starting-style:translate-x-full sm:w-[720px] sm:rounded-l-2xl motion-reduce:transition-none">
+          <div className="flex items-start justify-between gap-4 p-6 pb-3">
             <div className="flex flex-col gap-1">
               <Dialog.Title className="text-lg leading-6 font-semibold">Ngày nghỉ lễ, Tết</Dialog.Title>
               <Dialog.Description className="text-sm leading-5 text-muted-foreground">
@@ -74,7 +74,7 @@ export function HolidayPanel({ state, dispatch }: HolidayPanelProps) {
             </Dialog.Close>
           </div>
 
-          <div className="flex flex-col gap-5 overflow-y-auto px-5 pb-5">
+          <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 pb-6">
             <div role="radiogroup" aria-label="Năm" className="flex gap-2">
               {years.map((item) => (
                 <button
@@ -114,17 +114,18 @@ export function HolidayPanel({ state, dispatch }: HolidayPanelProps) {
 
             <div className="flex flex-col rounded-xl bg-muted/60 p-4">
               <span className="mb-3 text-sm leading-5 font-semibold">Thêm ngày nghỉ của đơn vị</span>
-              <div className="grid gap-x-3 sm:grid-cols-[180px_1fr]">
+              <div className="grid gap-x-3 sm:grid-cols-[200px_1fr_auto] sm:items-start">
                 <Field label="Ngày" htmlFor="custom-holiday-date">
                   <DateField id="custom-holiday-date" value={date} onValueChange={setDate} className="bg-card" />
                 </Field>
                 <Field label="Tên ngày nghỉ" htmlFor="custom-holiday-label">
                   <Input id="custom-holiday-label" size="lg" placeholder="Ví dụ: Nghỉ bù Tết" value={label} onChange={(e) => setLabel(e.target.value)} className="bg-card" />
                 </Field>
+                {/* Căn với ô nhập: chừa chỗ nhãn 20px + 8px phía trên. */}
+                <Button size="lg" onClick={addCustom} disabled={!date} className="self-start sm:mt-7">
+                  <Plus aria-hidden /> Thêm
+                </Button>
               </div>
-              <Button size="md" onClick={addCustom} disabled={!date} className="self-start">
-                <Plus aria-hidden /> Thêm ngày nghỉ
-              </Button>
 
               {Object.keys(state.customHolidays).length > 0 ? (
                 <ul className="mt-4 flex flex-col gap-1">
