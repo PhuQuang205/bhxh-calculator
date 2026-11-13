@@ -46,10 +46,9 @@ src/components/ui|form/    UI kit port từ portal-sales-pharmacy
 ```
 
 - UI kết quả chỉ đọc `CalcResult`, không tự tính lại.
-- Lương (tháng liền kề / BQ 6 tháng) là **tùy chọn** theo phản hồi của khách: thiếu lương vẫn trả `CalcResult` đầy đủ số ngày, `withoutMoney()` bỏ phần tiền và gắn `moneyMissing`.
+- **Chỉ tính số ngày, không tính tiền** (khách yêu cầu 13/11/2026). Không có ô lương; `CalcResult` không có phần tiền. Tỷ lệ/mức tham chiếu trong `rules.ts` giữ lại làm hồ sơ đặc tả, không dùng. Cột "Công thức tiền" ở bảng trên chỉ để tham khảo.
 - Ngày nghỉ hằng tuần là danh sách thứ (`WeeklyRest = number[]`, 0 = CN … 6 = T7). UI theo yêu cầu khách: 3 thẻ "Chủ nhật" / "Thứ 7 & Chủ nhật" / "Ngày nghỉ khác" (mới hiện 7 nút chọn thứ).
 - Ngày truyền đi dạng chuỗi ISO `yyyy-MM-dd`.
-- Tiền là số nguyên đồng (`Math.round` ở từng dòng).
 
 ## Giao diện
 
