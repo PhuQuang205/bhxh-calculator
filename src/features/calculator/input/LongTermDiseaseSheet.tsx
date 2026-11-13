@@ -62,7 +62,7 @@ export function LongTermDiseaseSheet({ trigger = "pill" }: { trigger?: keyof typ
               size="lg"
               autoComplete="off"
               aria-label="Lọc theo tên bệnh hoặc mã ICD-10"
-              placeholder="Lọc theo tên bệnh hoặc mã ICD-10, ví dụ I63"
+              placeholder="Nhập tên bệnh hoặc mã ICD-10"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />

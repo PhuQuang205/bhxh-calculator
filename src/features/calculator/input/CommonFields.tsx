@@ -1,7 +1,5 @@
 "use client";
 
-import { format, parseISO } from "date-fns";
-
 import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
@@ -60,7 +58,6 @@ export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd 
             id="end-date"
             value={state.end}
             highlighted={holidayDates}
-            placeholder={entitledEnd ? format(parseISO(entitledEnd), "dd/MM/yyyy") : undefined}
             aria-invalid={endError ? true : undefined}
             onValueChange={(end) => dispatch({ type: "set", patch: { end } })}
           />

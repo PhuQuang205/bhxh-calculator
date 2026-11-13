@@ -119,7 +119,7 @@ export function HolidayPanel({ state, dispatch }: HolidayPanelProps) {
                   <DateField id="custom-holiday-date" value={date} onValueChange={setDate} className="bg-card" />
                 </Field>
                 <Field label="Tên ngày nghỉ" htmlFor="custom-holiday-label">
-                  <Input id="custom-holiday-label" size="lg" placeholder="Ví dụ: Nghỉ bù Tết" value={label} onChange={(e) => setLabel(e.target.value)} className="bg-card" />
+                  <Input id="custom-holiday-label" size="lg" placeholder="Nhập tên ngày nghỉ" value={label} onChange={(e) => setLabel(e.target.value)} className="bg-card" />
                 </Field>
                 {/* Căn với ô nhập: chừa chỗ nhãn 20px + 8px phía trên. */}
                 <Button size="lg" onClick={addCustom} disabled={!date} className="self-start sm:mt-7">

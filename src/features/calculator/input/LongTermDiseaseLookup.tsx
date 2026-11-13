@@ -22,7 +22,7 @@ export function LongTermDiseaseLookup() {
           type="search"
           size="lg"
           autoComplete="off"
-          placeholder="Nhập tên bệnh hoặc mã ICD-10, ví dụ I63"
+          placeholder="Nhập tên bệnh hoặc mã ICD-10"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
