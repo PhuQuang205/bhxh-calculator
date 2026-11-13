@@ -1,26 +1,126 @@
 @import "tailwindcss";
 
+/* Chưa làm chế độ tối: dark: chỉ bật theo lớp .dark, không tự bật theo hệ điều hành. */
+@custom-variant dark (&:is(.dark *));
+
+/* Token màu lấy từ portal-sales-pharmacy để form và nút cùng một hệ nhìn. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2f2f2;
+  --foreground: #1f1f24;
+  --card: #ffffff;
+  --popover: #ffffff;
+  --popover-foreground: #1f1f24;
+  --primary: #0762d9;
+  --primary-foreground: #ffffff;
+  --muted: #f2f2f2;
+  --muted-foreground: #6b6b73;
+  --border: #dddddd;
+  --border-subtle: #e3e3e3;
+  --chip: #f0f0f0;
+  --ring: #0762d9;
+  --ink: #1c1d22;
+  --ink-soft: #2a2b31;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: #0552b8;
+  --color-primary-soft: #6ba5f2;
+  --color-primary-subtle: #9bc1f2;
+  --color-primary-tint: #eaf2fd;
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive-strong: #c8323d;
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-chip: var(--chip);
+  --color-ring: var(--ring);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-status-approved-bg: #e8f6ee;  --color-status-approved-fg: #1e7a46;  --color-status-approved-border: #bfe5cf;
+  --color-status-pending-bg: #fff6e5;   --color-status-pending-fg: #a05a00;   --color-status-pending-border: #fbdda6;
+  --color-status-danger-bg: #feecee;    --color-status-danger-fg: #c8323d;    --color-status-danger-border: #fbc5c9;
+  --color-status-info-bg: #eaf2fd;      --color-status-info-fg: #0552b8;      --color-status-info-border: #c3dafa;
+  --color-status-violet-bg: #f1edfd;    --color-status-violet-fg: #5b3cc4;    --color-status-violet-border: #d9cff8;
+  --radius-sm: 0.5rem;   /* 8  */
+  --radius-md: 0.75rem;  /* 12 */
+  --radius-lg: 1rem;     /* 16 — ô nhập */
+  --radius-xl: 1.5rem;   /* 24 — card */
+  --radius-2xl: 2rem;    /* 32 — card lớn, thanh điều hướng */
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.03);
+  --font-sans: var(--font-google-sans-flex), "Google Sans Flex Fallback", ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Font dự phòng đã chỉnh số đo để chữ không nhảy khi Google Sans Flex tải xong (lấy từ portal). */
+@font-face {
+  font-family: "Google Sans Flex Fallback";
+  src: local("Arial");
+  ascent-override: 94.61%;
+  descent-override: 28.01%;
+  line-gap-override: 0%;
+  size-adjust: 102.1%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Lịch chọn ngày (react-day-picker) theo màu dự án. */
+.rdp-root {
+  --rdp-accent-color: var(--primary);
+  --rdp-accent-background-color: var(--color-primary-tint);
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-day_button-height: 38px;
+  --rdp-day_button-width: 38px;
+  --rdp-day_button-border-radius: 999px;
+  font-size: 0.875rem;
+}
+.rdp-holiday:not(.rdp-selected) .rdp-day_button {
+  color: var(--color-destructive-strong);
+  font-weight: 600;
+}
+
+/* Phiếu tính chỉ hiện khi in; phần giao diện ẩn đi. */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+.print-only {
+  display: none;
 }
