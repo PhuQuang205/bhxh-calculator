@@ -35,6 +35,9 @@ const ENTRIES = LONG_TERM_DISEASE_ROWS.map(([no, group, name, codes]) => ({
 }));
 
 export const LONG_TERM_DISEASE_COUNT = ENTRIES.length;
+export const LONG_TERM_DISEASE_SOURCE = "Phụ lục I, Thông tư 25/2025/TT-BYT ngày 30/6/2025";
+export const LONG_TERM_DISEASES: readonly LongTermDisease[] = ENTRIES.map((entry) => entry.disease);
+export { LONG_TERM_GROUPS };
 
 function fold(text: string): string {
   return text.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
@@ -43,7 +46,7 @@ function fold(text: string): string {
 const ICD_QUERY = /^[A-Za-z]\d{2}(?:\.?\d{0,2})\*?$/;
 
 /** Tra cứu theo mã ICD-10 (ví dụ "D16.3", "I63") hoặc theo tên bệnh, không phân biệt dấu. */
-export function searchLongTermDiseases(query: string, limit = 8): LongTermDisease[] {
+export function searchLongTermDiseases(query: string, limit = Number.POSITIVE_INFINITY): LongTermDisease[] {
   const q = query.trim();
   if (!q) return [];
   if (ICD_QUERY.test(q)) {

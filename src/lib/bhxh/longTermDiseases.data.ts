@@ -1,5 +1,5 @@
 /**
- * Phụ lục I – Danh mục bệnh cần chữa trị dài ngày (Thông tư Bộ Y tế quy định chi tiết Luật BHXH 2024).
+ * Phụ lục I – Danh mục bệnh cần chữa trị dài ngày, ban hành kèm Thông tư 25/2025/TT-BYT ngày 30/6/2025 của Bộ trưởng Bộ Y tế.
  * Sinh tự động từ PDF khách gửi ngày 13/11/2026. Không sửa tay từng dòng; nếu Bộ Y tế đổi danh mục thì sinh lại.
  * Cột cuối là mã ICD-10 nguyên văn, ví dụ "Từ A15 đến A19", "A30 và B92", "G53.0*".
  */
