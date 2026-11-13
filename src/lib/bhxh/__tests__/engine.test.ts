@@ -5,6 +5,7 @@ import { birthEntitledEnd, birthMonths, calculateMaternity, miscarriageTier, pat
 import type { PeriodContext } from "../period";
 import { calculateRecovery } from "../recovery";
 import { calculateSickness } from "../sickness";
+import { LONG_TERM_DISEASE_COUNT, searchLongTermDiseases } from "../longTermDiseases";
 import type { MaternityInput, RecoveryInput, SicknessInput } from "../inputs";
 import { isPending, type CalcOutcome, type CalcResult } from "../types";
 
@@ -197,6 +198,27 @@ describe("Thai sản", () => {
   it("cảnh báo nghỉ trước sinh quá 2 tháng", () => {
     const result = done(calculateMaternity({ ...maternity, birthDate: "2026-09-12" }, ctx("2026-06-01", null)));
     expect(result.alerts.some((a) => a.level === "warning" && a.text.includes("trước sinh"))).toBe(true);
+  });
+});
+
+describe("Danh mục bệnh dài ngày", () => {
+  it("đủ 282 bệnh theo Phụ lục I", () => {
+    expect(LONG_TERM_DISEASE_COUNT).toBe(282);
+  });
+
+  it("mã 3 ký tự bao gồm mã con, khoảng mã tính đúng", () => {
+    expect(searchLongTermDiseases("D16.3")[0]?.no).toBe(33);
+    expect(searchLongTermDiseases("A17.0")[0]?.name).toBe("Bệnh Lao");
+    expect(searchLongTermDiseases("A06.0")).toHaveLength(0);
+    expect(searchLongTermDiseases("A06.5")[0]?.no).toBe(1);
+    expect(searchLongTermDiseases("B92")[0]?.no).toBe(5);
+    expect(searchLongTermDiseases("Z21")[0]?.no).toBe(9);
+    expect(searchLongTermDiseases("J00")).toHaveLength(0);
+  });
+
+  it("tìm theo tên không phân biệt dấu", () => {
+    expect(searchLongTermDiseases("tam than phan liet").some((d) => d.codes === "F20")).toBe(true);
+    expect(searchLongTermDiseases("Suy tim").some((d) => d.codes === "I50")).toBe(true);
   });
 });
 
