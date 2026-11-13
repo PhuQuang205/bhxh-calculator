@@ -8,7 +8,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Tính chế độ BHXH – Ốm đau, Thai sản, Dưỡng sức",
   description:
-    "Công cụ tính nhanh số ngày hưởng và tiền trợ cấp BHXH ốm đau, thai sản, dưỡng sức phục hồi sức khỏe theo Luật BHXH 41/2024/QH15. Xử lý hoàn toàn trên trình duyệt.",
+    "Tính nhanh số ngày hưởng BHXH ốm đau, thai sản, dưỡng sức phục hồi sức khỏe theo Luật BHXH 41/2024/QH15.",
+  authors: [{ name: "Nguyễn Thị Hồng Quyên" }],
 };
 
 export const viewport: Viewport = {
