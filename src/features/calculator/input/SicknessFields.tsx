@@ -1,0 +1,91 @@
+"use client";
+
+import { Field } from "@/components/form/Field";
+import { FieldSet } from "@/components/form/FieldSet";
+import { MoneyInput } from "@/components/form/MoneyInput";
+import { Stepper } from "@/components/form/Stepper";
+import { RadioCards } from "@/components/ui/radio-cards";
+import { SwitchField } from "@/components/ui/switch";
+import { CONTRIBUTION_LABEL, SICKNESS, type ContributionTier } from "@/lib/bhxh/rules";
+import { SICKNESS_KIND_LABEL } from "@/lib/bhxh/sickness";
+import type { SicknessInput, SicknessKind } from "@/lib/bhxh/inputs";
+
+import type { Action } from "../state";
+
+const KINDS: { value: SicknessKind; label: string; description: string }[] = [
+  { value: "self", label: SICKNESS_KIND_LABEL.self, description: "Nghỉ theo chỉ định y tế" },
+  { value: "child", label: SICKNESS_KIND_LABEL.child, description: "Nghỉ để chăm sóc con ốm" },
+  { value: "longterm", label: "Bệnh dài ngày", description: "Thuộc danh mục bệnh cần chữa trị dài ngày" },
+];
+
+const TIERS = (Object.keys(CONTRIBUTION_LABEL) as ContributionTier[]).map((value) => ({
+  value,
+  label: CONTRIBUTION_LABEL[value],
+}));
+
+export function SicknessKindField({ value, dispatch }: { value: SicknessKind; dispatch: React.Dispatch<Action> }) {
+  return (
+    <FieldSet id="sickness-kind" label="Phân loại">
+      {(labelId) => (
+        <RadioCards
+          aria-labelledby={labelId}
+          columns={1}
+          options={KINDS}
+          value={value}
+          onValueChange={(kind) => dispatch({ type: "sickness", patch: { kind } })}
+        />
+      )}
+    </FieldSet>
+  );
+}
+
+export function SicknessFields({ input, dispatch }: { input: SicknessInput; dispatch: React.Dispatch<Action> }) {
+  const set = (patch: Partial<SicknessInput>) => dispatch({ type: "sickness", patch });
+  const cap = (input.heavyWork ? SICKNESS.capHeavy : SICKNESS.capNormal)[input.contribution];
+  return (
+    <>
+      <FieldSet id="contribution" label="Thời gian đã đóng BHXH">
+        {(labelId) => (
+          <RadioCards
+            aria-labelledby={labelId}
+            columns={3}
+            options={TIERS}
+            value={input.contribution}
+            onValueChange={(contribution) => set({ contribution })}
+          />
+        )}
+      </FieldSet>
+
+      <SwitchField
+        id="heavy-work"
+        label="Nghề, công việc nặng nhọc, độc hại"
+        description={`Trần ngày hưởng hiện tại: ${cap} ngày/năm`}
+        checked={input.heavyWork}
+        onCheckedChange={(heavyWork) => set({ heavyWork })}
+        className="mb-6"
+      />
+
+      <div className="grid gap-x-3 sm:grid-cols-3">
+        <FieldSet id="half-days" label="Ngày nghỉ lẻ" hint="Dưới nửa ngày tính 0,5">
+          {(labelId) => (
+            <Stepper itemName="Số ngày nghỉ dưới nửa ngày" value={input.halfDays} onValueChange={(halfDays) => set({ halfDays })} aria-describedby={labelId} className="w-full justify-between" />
+          )}
+        </FieldSet>
+        <FieldSet id="leave-overlap" label="Trùng phép" hint="Phép, việc riêng, không lương">
+          {(labelId) => (
+            <Stepper itemName="Số ngày trùng nghỉ phép" value={input.leaveOverlap} onValueChange={(leaveOverlap) => set({ leaveOverlap })} aria-describedby={labelId} className="w-full justify-between" />
+          )}
+        </FieldSet>
+        <FieldSet id="used-days" label="Đã nghỉ trong năm" hint="Ngày đã hưởng trước đợt này">
+          {(labelId) => (
+            <Stepper itemName="Số ngày đã nghỉ trong năm" step={0.5} value={input.usedDays} onValueChange={(usedDays) => set({ usedDays })} aria-describedby={labelId} className="w-full justify-between" />
+          )}
+        </FieldSet>
+      </div>
+
+      <Field label="Tiền lương đóng BHXH tháng liền kề" htmlFor="salary">
+        <MoneyInput id="salary" size="lg" placeholder="Ví dụ 8.000.000" value={input.salary} onValueChange={(salary) => set({ salary })} />
+      </Field>
+    </>
+  );
+}
