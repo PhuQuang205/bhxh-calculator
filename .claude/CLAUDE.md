@@ -37,6 +37,7 @@ Viết tắt: BQ = bình quân tiền lương đóng BHXH 6 tháng liền kề.
 src/lib/bhxh/          engine thuần (không React), có test vitest
   rules.ts             MỌI con số nghiệp vụ
   holidays.ts          lịch nghỉ lễ/Tết có sẵn theo năm + gộp ngày tùy chỉnh
+  longTermDiseases*.ts Phụ lục I danh mục 282 bệnh dài ngày (TT Bộ Y tế, PDF khách gửi 13/11/2026), tra theo tên hoặc mã ICD-10; chỉ để đối chiếu
   dateEngine.ts        đếm ngày lịch / ngày làm việc, dựng từng ô ngày, diễn giải ngày bị trừ
   period.ts            khoảng nghỉ dùng chung
   sickness.ts, maternity.ts, recovery.ts → trả về CalcOutcome (CalcResult | CalcPending)
