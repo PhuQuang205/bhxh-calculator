@@ -10,6 +10,8 @@ import type { SicknessInput, SicknessKind } from "@/lib/bhxh/inputs";
 
 import type { Action } from "../state";
 
+import { LongTermDiseaseLookup } from "./LongTermDiseaseLookup";
+
 const KINDS: { value: SicknessKind; label: string; description: string }[] = [
   { value: "self", label: SICKNESS_KIND_LABEL.self, description: "Nghỉ theo chỉ định y tế" },
   { value: "child", label: SICKNESS_KIND_LABEL.child, description: "Nghỉ để chăm sóc con ốm" },
@@ -42,6 +44,7 @@ export function SicknessFields({ input, dispatch }: { input: SicknessInput; disp
   const cap = (input.heavyWork ? SICKNESS.capHeavy : SICKNESS.capNormal)[input.contribution];
   return (
     <>
+      {input.kind === "longterm" ? <LongTermDiseaseLookup /> : null}
       <FieldSet id="contribution" label="Thời gian đã đóng BHXH">
         {(labelId) => (
           <RadioCards
