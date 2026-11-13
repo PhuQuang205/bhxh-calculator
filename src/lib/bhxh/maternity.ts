@@ -1,12 +1,10 @@
 import { addDays, addMonths, format, parseISO } from "date-fns";
 
-import { formatDays, formatMoney } from "../format";
-
 import { countCalendarDays, isISODate, toISO } from "./dateEngine";
 import type { MaternityInput } from "./inputs";
 import { buildPeriod, periodProblem, type PeriodContext } from "./period";
 import { MATERNITY } from "./rules";
-import { withoutMoney, type CalcAlert, type CalcOutcome, type CalcResult, type CapUsage, type DayRule, type ISODate, type MoneyLine } from "./types";
+import type { CalcAlert, CalcOutcome, CalcResult, CapUsage, DayRule, ISODate } from "./types";
 
 export const MATERNITY_KIND_LABEL: Record<MaternityInput["kind"], string> = {
   prenatal: "Khám thai",
@@ -84,10 +82,7 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
   }
   if (missing.length > 0 || !ctx.start) return { pending: true, rule, missing };
 
-  // Lương không bắt buộc: thiếu lương vẫn tính số ngày, chỉ bỏ phần tiền.
-  const avg = input.avgSalary ?? 0;
-  const moneyMissing = input.avgSalary ? null : "Bình quân tiền lương 6 tháng liền kề";
-  if (input.kind === "birth") return withoutMoney(calculateBirth(input, avg, ctx.start, ctx.end, ctx), moneyMissing);
+  if (input.kind === "birth") return calculateBirth(input, ctx.start, ctx.end, ctx);
 
   const period = buildPeriod(ctx.start, ctx.end as ISODate, rule, ctx);
   const alerts: CalcAlert[] = [...period.alerts];
@@ -144,19 +139,10 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
       citation,
     });
   }
-  const unit = rule === "working" ? "ngày làm việc" : "ngày";
-  const divisor = MATERNITY.dayDivisor;
-  const lines: MoneyLine[] = [
-    {
-      label: `${label}, ${formatDays(benefitDays)} ${unit}`,
-      amount: Math.round((avg / divisor) * MATERNITY.rate * benefitDays),
-      formula: `(${formatMoney(avg)} ÷ ${divisor}) × 100% × ${formatDays(benefitDays)} ngày`,
-    },
-  ];
   const cap: CapUsage | undefined =
     entitled === null ? undefined : { label: `Mức tối đa: ${label.toLowerCase()}`, used: period.counted, limit: entitled, unit: "ngày" };
 
-  return withoutMoney({
+  return {
     rule,
     calendarDays: period.calendarDays,
     benefitDays,
@@ -164,20 +150,18 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
     days: period.days,
     deductions: period.deductions,
     cap,
-    lines,
-    total: lines.reduce((sum, line) => sum + line.amount, 0),
     alerts: withOk(alerts, citation),
-    citations: [citation, MATERNITY.citations.rate],
-  }, moneyMissing);
+    citations: [citation],
+  };
 }
 
-function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end: ISODate | null, ctx: PeriodContext): CalcResult {
+function calculateBirth(input: MaternityInput, start: ISODate, end: ISODate | null, ctx: PeriodContext): CalcResult {
   const citation = MATERNITY.citations.birth;
   const birthDate = effectiveBirthDate(input, start);
   const months = birthMonths(input, birthDate);
   const entitledEnd = birthEntitledEnd(start, input, birthDate);
   const alerts: CalcAlert[] = [];
-  const citations: string[] = [citation, MATERNITY.citations.rate];
+  const citations: string[] = [citation];
 
   if (isSecondChildPolicy(input, birthDate)) {
     alerts.push({ level: "info", text: "Áp dụng chính sách sinh con thứ hai từ 01/07/2026: nghỉ 7 tháng.", citation: MATERNITY.citations.secondChild });
@@ -206,13 +190,6 @@ function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end:
   }
 
   const period = buildPeriod(start, shownEnd, "continuous", ctx);
-  const lines: MoneyLine[] = [
-    {
-      label: `Trợ cấp sinh con, ${months} tháng`,
-      amount: Math.round(avg * MATERNITY.rate * months),
-      formula: `${formatMoney(avg)} × ${months} tháng`,
-    },
-  ];
   const entitledDays = countCalendarDays(start, entitledEnd);
 
   return {
@@ -223,8 +200,6 @@ function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end:
     benefitMonths: months,
     days: period.days,
     deductions: [`Thời gian được hưởng: ${months} tháng liên tục, từ ${dmy(start)} đến hết ${dmy(entitledEnd)}`],
-    lines,
-    total: lines[0].amount,
     alerts: withOk([...period.alerts, ...alerts], citation),
     citations,
   };

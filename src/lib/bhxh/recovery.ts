@@ -1,12 +1,10 @@
 import { format, parseISO } from "date-fns";
 
-import { formatDays, formatMoney } from "../format";
-
 import { addDaysISO, isISODate } from "./dateEngine";
 import type { RecoveryInput } from "./inputs";
 import { buildPeriod, periodProblem, type PeriodContext } from "./period";
-import { RECOVERY, referenceLevelAt } from "./rules";
-import type { CalcAlert, CalcOutcome, ISODate, MoneyLine } from "./types";
+import { RECOVERY } from "./rules";
+import type { CalcAlert, CalcOutcome, ISODate } from "./types";
 
 export const RECOVERY_CASE_LABEL = {
   sickness: { longterm: "Bệnh dài ngày", surgery: "Có phẫu thuật", other: "Trường hợp khác" },
@@ -71,15 +69,6 @@ export function calculateRecovery(input: RecoveryInput, ctx: PeriodContext): Cal
     alerts.unshift({ level: "ok", text: "Đủ điều kiện tính hưởng theo số ngày đã nhập.", citation });
   }
 
-  const reference = referenceLevelAt(ctx.start);
-  const lines: MoneyLine[] = [
-    {
-      label: `Dưỡng sức sau ${input.after === "sickness" ? "ốm đau" : "thai sản"}, ${formatDays(benefitDays)} ngày`,
-      amount: Math.round(reference.amount * RECOVERY.rate * benefitDays),
-      formula: `${formatMoney(reference.amount)} (mức tham chiếu) × 30% × ${formatDays(benefitDays)} ngày`,
-    },
-  ];
-
   return {
     rule: "continuous",
     calendarDays: period.calendarDays,
@@ -88,9 +77,7 @@ export function calculateRecovery(input: RecoveryInput, ctx: PeriodContext): Cal
     days: period.days,
     deductions: [],
     cap: { label: `Mức tối đa: ${caseLabel(input).toLowerCase()}`, used: period.counted, limit, unit: "ngày" },
-    lines,
-    total: lines.reduce((sum, line) => sum + line.amount, 0),
     alerts,
-    citations: [citation, `Mức tham chiếu ${formatMoney(reference.amount)} theo ${reference.source}`],
+    citations: [citation],
   };
 }

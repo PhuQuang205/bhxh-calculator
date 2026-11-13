@@ -25,13 +25,6 @@ export interface CalcAlert {
   citation?: string;
 }
 
-export interface MoneyLine {
-  label: string;
-  amount: number;
-  /** Công thức đã thay số, ví dụ "(8.000.000 ÷ 24) × 75% × 5,5 ngày". */
-  formula: string;
-}
-
 export interface CapUsage {
   label: string;
   /** Số ngày (hoặc tháng) đã dùng tính cả lần này. */
@@ -46,7 +39,7 @@ export interface CalcResult {
   calendarDays: number;
   /** Số ngày thực tế được hưởng (có thể lẻ 0,5). */
   benefitDays: number;
-  /** Số ngày tính tiền (đã chặn theo trần nếu có). */
+  /** Số ngày được tính hưởng sau khi chặn theo trần (nếu có). */
   paidDays: number;
   /** Thời gian hưởng tính theo tháng (sinh con). */
   benefitMonths?: number;
@@ -54,17 +47,8 @@ export interface CalcResult {
   /** Diễn giải các khoản trừ, ví dụ "Trừ 2 Chủ nhật (03/05, 10/05)". */
   deductions: string[];
   cap?: CapUsage;
-  lines: MoneyLine[];
-  total: number;
   alerts: CalcAlert[];
   citations: string[];
-  /** Có giá trị khi chưa nhập lương: chỉ tính số ngày, chưa tính tiền. Ghi tên ô còn thiếu. */
-  moneyMissing?: string;
-}
-
-/** Bỏ phần tiền khi chưa có lương: kết quả số ngày vẫn hiện đầy đủ. */
-export function withoutMoney(result: CalcResult, missing: string | null): CalcResult {
-  return missing ? { ...result, lines: [], total: 0, moneyMissing: missing } : result;
 }
 
 /** Kết quả khi dữ liệu chưa đủ để tính: UI hiện trạng thái rỗng kèm lời nhắc. */

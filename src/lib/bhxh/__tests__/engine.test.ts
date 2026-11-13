@@ -29,7 +29,6 @@ const sickness: SicknessInput = {
   halfDays: 0,
   leaveOverlap: 0,
   usedDays: 0,
-  salary: 7_200_000,
 };
 
 const maternity: MaternityInput = {
@@ -41,7 +40,6 @@ const maternity: MaternityInput = {
   birthDate: null,
   wifeBirth: "normal",
   wifePreterm: false,
-  avgSalary: 9_600_000,
 };
 
 describe("dateEngine", () => {
@@ -80,23 +78,21 @@ describe("dateEngine", () => {
 
 describe("Ốm đau", () => {
   it("chờ đủ dữ liệu", () => {
-    const outcome = calculateSickness({ ...sickness, salary: null }, ctx("2026-04-27", null));
+    const outcome = calculateSickness(sickness, ctx("2026-04-27", null));
     expect(isPending(outcome)).toBe(true);
   });
 
-  it("nghỉ vắt qua lễ 30/4 – 1/5: (lương ÷ 24) × 75% × ngày", () => {
+  it("nghỉ vắt qua lễ 30/4 – 1/5 không tính ngày lễ, Chủ nhật", () => {
     const result = done(calculateSickness(sickness, ctx("2026-04-27", "2026-05-08")));
     expect(result.rule).toBe("working");
     expect(result.calendarDays).toBe(12);
     expect(result.benefitDays).toBe(9);
-    // 7.200.000 / 24 = 300.000; × 75% = 225.000; × 9 = 2.025.000
-    expect(result.total).toBe(2_025_000);
+    expect(result.paidDays).toBe(9);
   });
 
   it("nghỉ dưới nửa ngày tính 0,5 ngày, trừ ngày trùng phép", () => {
     const result = done(calculateSickness({ ...sickness, halfDays: 1, leaveOverlap: 2 }, ctx("2026-04-27", "2026-05-08")));
     expect(result.benefitDays).toBe(6.5);
-    expect(result.total).toBe(1_462_500);
   });
 
   it("vượt trần 30 ngày/năm thì chỉ tính phần còn lại và báo đỏ", () => {
@@ -114,27 +110,18 @@ describe("Ốm đau", () => {
     expect(cap({ contribution: "gte30", heavyWork: true })).toBe(70);
   });
 
-  it("bệnh dài ngày quá 180 ngày chuyển sang tỷ lệ thấp hơn", () => {
+  it("bệnh dài ngày quá 180 ngày vẫn tính đủ ngày, báo phần sau 180 ngày", () => {
     const result = done(calculateSickness({ ...sickness, kind: "longterm", usedDays: 175 }, ctx("2026-04-27", "2026-05-08")));
-    expect(result.lines).toHaveLength(2);
-    // 5 ngày × 225.000 + 4 ngày × 300.000 × 50%
-    expect(result.total).toBe(1_125_000 + 600_000);
-  });
-
-  it("chưa nhập lương vẫn ra số ngày, chỉ bỏ phần tiền", () => {
-    const result = done(calculateSickness({ ...sickness, salary: null }, ctx("2026-04-27", "2026-05-08")));
-    expect(result.benefitDays).toBe(9);
-    expect(result.lines).toHaveLength(0);
-    expect(result.moneyMissing).toBeTruthy();
+    expect(result.paidDays).toBe(9);
+    expect(result.alerts.some((a) => a.text.includes("quá 180 ngày"))).toBe(true);
   });
 });
 
 describe("Thai sản", () => {
-  it("sinh con chưa nhập lương vẫn ra thời gian hưởng", () => {
-    const result = done(calculateMaternity({ ...maternity, avgSalary: null }, ctx("2026-09-12", null)));
+  it("sinh con chỉ cần ngày bắt đầu là ra thời gian hưởng", () => {
+    const result = done(calculateMaternity(maternity, ctx("2026-09-12", null)));
     expect(result.benefitMonths).toBe(6);
     expect(result.calendarDays).toBe(181);
-    expect(result.moneyMissing).toBeTruthy();
   });
 
   it("sảy thai theo mốc tuần tuổi", () => {
@@ -145,11 +132,10 @@ describe("Thai sản", () => {
     expect(miscarriageTier(22).days).toBe(50);
   });
 
-  it("sảy thai tính ngày liên tục, chia 24", () => {
+  it("sảy thai tính ngày liên tục", () => {
     const result = done(calculateMaternity({ ...maternity, kind: "miscarriage", gestationWeeks: 4 }, ctx("2026-04-27", "2026-05-06")));
     expect(result.rule).toBe("continuous");
     expect(result.benefitDays).toBe(10);
-    expect(result.total).toBe(4_000_000);
   });
 
   it("sảy thai nhập quá mức thì báo vượt", () => {
@@ -167,7 +153,7 @@ describe("Thai sản", () => {
 
   it("khám thai quá 5 lần thì không được hưởng", () => {
     const result = done(calculateMaternity({ ...maternity, kind: "prenatal", visitNo: 6 }, ctx("2026-04-27", "2026-04-27")));
-    expect(result.total).toBe(0);
+    expect(result.benefitDays).toBe(0);
   });
 
   it("sinh con 6 tháng, sinh đôi thêm 1 tháng", () => {
@@ -177,7 +163,6 @@ describe("Thai sản", () => {
     expect(birthEntitledEnd("2026-01-15", one, "2026-01-15")).toBe("2026-07-14");
     const result = done(calculateMaternity(maternity, ctx("2026-01-15", null)));
     expect(result.benefitMonths).toBe(6);
-    expect(result.total).toBe(57_600_000);
   });
 
   it("nam nghỉ khi vợ sinh: 5 / 7 / 10 / 14 ngày làm việc", () => {
@@ -197,7 +182,7 @@ describe("Thai sản", () => {
     expect(birthMonths(second, "2026-06-30")).toBe(6);
     expect(birthMonths(second, "2026-07-01")).toBe(7);
     expect(birthMonths({ ...second, babies: 2 }, "2026-07-01")).toBe(8);
-    const result = done(calculateMaternity({ ...maternity, secondChild: true, avgSalary: null }, ctx("2026-09-12", null)));
+    const result = done(calculateMaternity({ ...maternity, secondChild: true }, ctx("2026-09-12", null)));
     expect(result.benefitMonths).toBe(7);
     expect(result.deductions[0]).toContain("đến hết 11/04/2027");
   });
@@ -218,11 +203,10 @@ describe("Thai sản", () => {
 describe("Dưỡng sức", () => {
   const recovery: RecoveryInput = { after: "sickness", caseKind: "surgery", prevEnd: "2026-04-19" };
 
-  it("702.000 đ/ngày, tính ngày liên tục", () => {
+  it("tính ngày liên tục", () => {
     const result = done(calculateRecovery(recovery, ctx("2026-04-27", "2026-05-01")));
     expect(result.rule).toBe("continuous");
     expect(result.benefitDays).toBe(5);
-    expect(result.total).toBe(3_510_000);
   });
 
   it("8 ngày sau phẫu thuật vượt trần 7 ngày", () => {

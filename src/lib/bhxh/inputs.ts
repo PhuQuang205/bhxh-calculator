@@ -24,7 +24,6 @@ export interface SicknessInput {
   leaveOverlap: number;
   /** Số ngày đã hưởng ốm đau trước đó trong năm. */
   usedDays: number;
-  salary: number | null;
 }
 
 export interface MaternityInput {
@@ -43,7 +42,6 @@ export interface MaternityInput {
   wifeBirth: WifeBirthKind;
   /** Nam nghỉ khi vợ sinh: vợ sinh con dưới 32 tuần tuổi. */
   wifePreterm: boolean;
-  avgSalary: number | null;
 }
 
 export interface RecoveryInput {
