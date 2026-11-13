@@ -1,7 +1,10 @@
 "use client";
 
+import Image from "next/image";
+
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import logo from "./logo-bhxh.png";
 import type { Mode } from "./state";
 
 const MODES: readonly { value: Mode; label: string }[] = [
@@ -13,25 +16,11 @@ const MODES: readonly { value: Mode; label: string }[] = [
 function Logo() {
   return (
     <div className="flex items-center gap-2.5">
-      <svg aria-hidden viewBox="0 0 32 32" className="size-8 text-primary">
-        <circle cx="16" cy="16" r="5" fill="currentColor" />
-        {Array.from({ length: 12 }, (_, i) => (
-          <rect
-            key={i}
-            x="15"
-            y="2"
-            width="2"
-            height="7"
-            rx="1"
-            fill="currentColor"
-            transform={`rotate(${i * 30} 16 16)`}
-          />
-        ))}
-      </svg>
+      <Image src={logo} alt="" width={40} height={40} priority className="size-10 shrink-0" />
       <span className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
         <span className="text-lg leading-6 font-semibold tracking-tight whitespace-nowrap">BHXH Nhanh</span>
         <span className="text-xs leading-4 text-muted-foreground sm:text-sm sm:leading-5">
-          <span aria-hidden className="hidden sm:inline">- </span>Bản quyền Nguyễn Thị Hồng Quyên
+          <span aria-hidden className="hidden sm:inline">- </span>Bản quyền Bảo hiểm xã hội cơ sở Cầu Giấy
         </span>
       </span>
     </div>
