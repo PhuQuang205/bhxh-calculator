@@ -3,12 +3,21 @@ import type { MaternityInput, Mode, RecoveryInput, SicknessInput } from "@/lib/b
 
 export type * from "@/lib/bhxh/inputs";
 
+export type WeeklyRestPreset = "sun" | "sat-sun" | "custom";
+
+export const WEEKLY_REST_PRESETS: Record<Exclude<WeeklyRestPreset, "custom">, number[]> = {
+  sun: [0],
+  "sat-sun": [0, 6],
+};
+
 export interface CalculatorState {
   mode: Mode;
   fullName: string;
   start: ISODate | null;
   end: ISODate | null;
   weeklyRest: WeeklyRest;
+  /** Thẻ đang chọn ở "Lịch nghỉ hằng tuần": hai mẫu có sẵn hoặc tự chọn thứ. */
+  weeklyRestPreset: WeeklyRestPreset;
   /** Ngày nghỉ tùy chỉnh của đơn vị (thêm) → tên. */
   customHolidays: Record<ISODate, string>;
   /** Ngày lễ có sẵn mà đơn vị không nghỉ (bỏ). */
@@ -24,6 +33,7 @@ export const initialState: CalculatorState = {
   start: null,
   end: null,
   weeklyRest: [0],
+  weeklyRestPreset: "sun",
   customHolidays: {},
   removedHolidays: [],
   sickness: {
@@ -40,6 +50,8 @@ export const initialState: CalculatorState = {
     visitNo: 1,
     gestationWeeks: 8,
     babies: 1,
+    secondChild: false,
+    birthDate: null,
     wifeBirth: "normal",
     wifePreterm: false,
     avgSalary: null,
@@ -74,6 +86,7 @@ export function reducer(state: CalculatorState, action: Action): CalculatorState
         ...initialState,
         mode: state.mode,
         weeklyRest: state.weeklyRest,
+        weeklyRestPreset: state.weeklyRestPreset,
         customHolidays: state.customHolidays,
         removedHolidays: state.removedHolidays,
       };

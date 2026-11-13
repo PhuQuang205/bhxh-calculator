@@ -7,7 +7,7 @@ import { ArrowDown, RotateCcw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { formatMoney } from "@/lib/format";
 import { mergeHolidays } from "@/lib/bhxh/holidays";
-import { birthEntitledEnd, calculateMaternity, maternityRule } from "@/lib/bhxh/maternity";
+import { birthEntitledEnd, calculateMaternity, effectiveBirthDate, maternityRule } from "@/lib/bhxh/maternity";
 import type { PeriodContext } from "@/lib/bhxh/period";
 import { calculateRecovery } from "@/lib/bhxh/recovery";
 import { calculateSickness } from "@/lib/bhxh/sickness";
@@ -110,13 +110,13 @@ export function CalculatorView() {
                   dispatch={dispatch}
                   rule={rule}
                   holidayDates={holidayDates}
-                  entitledEnd={isBirth ? (state.start ? birthEntitledEnd(state.start, state.maternity.babies) : null) : undefined}
+                  entitledEnd={isBirth ? (state.start ? birthEntitledEnd(state.start, state.maternity, effectiveBirthDate(state.maternity, state.start)) : null) : undefined}
                 />
               </FormSection>
 
               <FormSection step={3} title="Chi tiết & tiền lương">
                 {state.mode === "sickness" ? <SicknessFields input={state.sickness} dispatch={dispatch} /> : null}
-                {state.mode === "maternity" ? <MaternityFields input={state.maternity} dispatch={dispatch} /> : null}
+                {state.mode === "maternity" ? <MaternityFields input={state.maternity} dispatch={dispatch} start={state.start} /> : null}
                 {state.mode === "recovery" ? <RecoveryFields input={state.recovery} dispatch={dispatch} start={state.start} /> : null}
               </FormSection>
             </Card>
@@ -127,9 +127,6 @@ export function CalculatorView() {
           </div>
         </div>
 
-        <footer className="text-center text-xs leading-5 text-muted-foreground">
-          Xử lý hoàn toàn trên trình duyệt, không lưu dữ liệu. Kết quả mang tính tham khảo theo Luật BHXH 41/2024/QH15.
-        </footer>
       </div>
 
       {!isPending(outcome) ? (

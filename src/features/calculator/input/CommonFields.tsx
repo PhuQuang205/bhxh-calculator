@@ -6,10 +6,17 @@ import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
 import { Input } from "@/components/ui/input";
+import { RadioCards } from "@/components/ui/radio-cards";
 import { WeekdayPicker, describeWeeklyRest } from "@/components/ui/weekday-picker";
 import type { DayRule, ISODate } from "@/lib/bhxh/types";
 
-import type { Action, CalculatorState } from "../state";
+import { WEEKLY_REST_PRESETS, type Action, type CalculatorState, type WeeklyRestPreset } from "../state";
+
+const PRESETS: { value: WeeklyRestPreset; label: string; description: string }[] = [
+  { value: "sun", label: "Chủ nhật", description: "Làm việc Thứ 2 – Thứ 7" },
+  { value: "sat-sun", label: "Thứ 7 & Chủ nhật", description: "Làm việc Thứ 2 – Thứ 6" },
+  { value: "custom", label: "Ngày nghỉ khác", description: "Tự chọn thứ nghỉ trong tuần" },
+];
 
 interface CommonFieldsProps {
   state: CalculatorState;
@@ -61,15 +68,42 @@ export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd 
       </div>
 
       {rule === "working" ? (
-        <FieldSet id="weekly-rest" label="Ngày nghỉ hằng tuần của đơn vị (bấm để chọn)" hint={describeWeeklyRest(state.weeklyRest)}>
-          {(labelId) => (
-            <WeekdayPicker
-              aria-labelledby={labelId}
-              value={state.weeklyRest}
-              onValueChange={(weeklyRest) => dispatch({ type: "set", patch: { weeklyRest } })}
-            />
-          )}
-        </FieldSet>
+        <>
+          <FieldSet
+            id="weekly-rest"
+            label="Lịch nghỉ hằng tuần của đơn vị"
+            hint={state.weeklyRestPreset === "custom" ? undefined : describeWeeklyRest(state.weeklyRest)}
+          >
+            {(labelId) => (
+              <RadioCards
+                aria-labelledby={labelId}
+                columns={3}
+                options={PRESETS}
+                value={state.weeklyRestPreset}
+                onValueChange={(preset) =>
+                  dispatch({
+                    type: "set",
+                    patch:
+                      preset === "custom"
+                        ? { weeklyRestPreset: preset }
+                        : { weeklyRestPreset: preset, weeklyRest: WEEKLY_REST_PRESETS[preset] },
+                  })
+                }
+              />
+            )}
+          </FieldSet>
+          {state.weeklyRestPreset === "custom" ? (
+            <FieldSet id="weekly-rest-days" label="Chọn các thứ đơn vị nghỉ (bấm để bật/tắt)" hint={describeWeeklyRest(state.weeklyRest)}>
+              {(labelId) => (
+                <WeekdayPicker
+                  aria-labelledby={labelId}
+                  value={state.weeklyRest}
+                  onValueChange={(weeklyRest) => dispatch({ type: "set", patch: { weeklyRest } })}
+                />
+              )}
+            </FieldSet>
+          ) : null}
+        </>
       ) : null}
     </>
   );

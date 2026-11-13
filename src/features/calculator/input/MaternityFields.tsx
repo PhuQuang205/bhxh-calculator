@@ -1,5 +1,6 @@
 "use client";
 
+import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
 import { MoneyInput } from "@/components/form/MoneyInput";
@@ -7,7 +8,7 @@ import { Stepper } from "@/components/form/Stepper";
 import { RadioCards } from "@/components/ui/radio-cards";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SwitchField } from "@/components/ui/switch";
-import { MATERNITY_KIND_LABEL, birthMonths, miscarriageTier, paternityDays } from "@/lib/bhxh/maternity";
+import { MATERNITY_KIND_LABEL, birthMonths, effectiveBirthDate, miscarriageTier, paternityDays } from "@/lib/bhxh/maternity";
 import { MATERNITY } from "@/lib/bhxh/rules";
 import type { MaternityInput, MaternityKind, WifeBirthKind } from "@/lib/bhxh/inputs";
 
@@ -55,8 +56,36 @@ export function MaternityKindField({ value, dispatch }: { value: MaternityKind; 
   );
 }
 
-export function MaternityFields({ input, dispatch }: { input: MaternityInput; dispatch: React.Dispatch<Action> }) {
+interface MaternityFieldsProps {
+  input: MaternityInput;
+  dispatch: React.Dispatch<Action>;
+  start: string | null;
+}
+
+/** Sinh con thứ hai + ngày sinh: dùng chung cho "Sinh con" và "Nam nghỉ khi vợ sinh". */
+function SecondChildFields({ input, set, father }: { input: MaternityInput; set: (patch: Partial<MaternityInput>) => void; father: boolean }) {
+  return (
+    <>
+      <SwitchField
+        id="second-child"
+        label={father ? "Vợ sinh con thứ hai" : "Sinh con thứ hai"}
+        description={`Tại thời điểm sinh ${father ? "người vợ " : ""}có một con đẻ còn sống. Áp dụng khi sinh từ 01/07/2026.`}
+        checked={input.secondChild}
+        onCheckedChange={(secondChild) => set({ secondChild })}
+        className="mb-6"
+      />
+      <Field label={father ? "Ngày vợ sinh con (tùy chọn)" : "Ngày sinh con (tùy chọn)"} htmlFor="birth-date">
+        <DateField id="birth-date" value={input.birthDate} onValueChange={(birthDate) => set({ birthDate })} />
+      </Field>
+      <p className="-mt-5 mb-4 text-xs leading-5 text-muted-foreground">Bỏ trống thì lấy ngày bắt đầu nghỉ làm ngày sinh.</p>
+    </>
+  );
+}
+
+export function MaternityFields({ input, dispatch, start }: MaternityFieldsProps) {
   const set = (patch: Partial<MaternityInput>) => dispatch({ type: "maternity", patch });
+  const birthDate = effectiveBirthDate(input, start ?? "9999-12-31");
+  const twins = input.wifeBirth === "twins" || input.wifeBirth === "twinsCaesarean";
   return (
     <>
       {input.kind === "prenatal" ? (
@@ -84,20 +113,31 @@ export function MaternityFields({ input, dispatch }: { input: MaternityInput; di
       ) : null}
 
       {input.kind === "birth" ? (
-        <FieldSet id="babies" label="Số con trong lần sinh" hint={`Được nghỉ ${birthMonths(input.babies)} tháng liên tục`}>
-          {(labelId) => (
-            <Stepper itemName="Số con" min={1} max={6} value={input.babies} onValueChange={(babies) => set({ babies })} aria-describedby={labelId} />
-          )}
-        </FieldSet>
+        <>
+          <SecondChildFields input={input} set={set} father={false} />
+          <FieldSet id="babies" label="Số con trong lần sinh" hint={`Được nghỉ ${birthMonths(input, birthDate)} tháng liên tục`}>
+            {(labelId) => (
+              <Stepper itemName="Số con" min={1} max={6} value={input.babies} onValueChange={(babies) => set({ babies })} aria-describedby={labelId} />
+            )}
+          </FieldSet>
+        </>
       ) : null}
 
       {input.kind === "paternity" ? (
         <>
-          <FieldSet id="wife-birth" label="Hình thức vợ sinh" hint={`Được nghỉ ${paternityDays(input)} ngày làm việc`}>
+          <FieldSet id="wife-birth" label="Hình thức vợ sinh" hint={`Được nghỉ ${paternityDays(input, birthDate)} ngày làm việc`}>
             {(labelId) => (
               <RadioCards aria-labelledby={labelId} options={WIFE_BIRTH} value={input.wifeBirth} onValueChange={(wifeBirth) => set({ wifeBirth })} />
             )}
           </FieldSet>
+          {twins ? (
+            <FieldSet id="paternity-babies" label="Số con vợ sinh" hint="Sinh ba trở lên: từ con thứ ba mỗi con thêm 3 ngày làm việc">
+              {(labelId) => (
+                <Stepper itemName="Số con" min={2} max={6} value={Math.max(2, input.babies)} onValueChange={(babies) => set({ babies })} aria-describedby={labelId} />
+              )}
+            </FieldSet>
+          ) : null}
+          <SecondChildFields input={input} set={set} father />
           {input.wifeBirth === "normal" ? (
             <SwitchField
               id="wife-preterm"
