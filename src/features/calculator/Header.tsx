@@ -18,7 +18,7 @@ function Logo() {
     <div className="flex items-center gap-2.5">
       <Image src={logo} alt="" width={40} height={40} priority className="size-10 shrink-0" />
       <span className="flex flex-col sm:flex-row sm:items-baseline sm:gap-1.5">
-        <span className="text-lg leading-6 font-semibold tracking-tight whitespace-nowrap">BHXH Nhanh</span>
+        <span className="text-lg leading-6 font-semibold tracking-tight whitespace-nowrap">BHXH Calculator</span>
         <span className="text-xs leading-4 text-muted-foreground sm:text-sm sm:leading-5">
           <span aria-hidden className="hidden sm:inline">- </span>Bản quyền Bảo hiểm xã hội cơ sở Cầu Giấy
         </span>
