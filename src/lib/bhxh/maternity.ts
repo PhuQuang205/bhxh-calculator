@@ -27,23 +27,45 @@ export function miscarriageTier(weeks: number) {
   return MATERNITY.miscarriage.find((tier) => weeks < tier.belowWeeks) ?? MATERNITY.miscarriage[MATERNITY.miscarriage.length - 1];
 }
 
-/** Sinh con: 6 tháng, thêm 1 tháng cho mỗi con từ con thứ hai trong cùng lần sinh. */
-export function birthMonths(babies: number): number {
-  return MATERNITY.birth.months + Math.max(0, babies - 1) * MATERNITY.birth.extraMonthsPerExtraBaby;
+type BirthFacts = Pick<MaternityInput, "babies" | "secondChild">;
+
+/** Có áp dụng chính sách sinh con thứ hai không: phải là con thứ hai và sinh từ 01/07/2026. */
+export function isSecondChildPolicy(input: Pick<MaternityInput, "secondChild">, birthDate: ISODate): boolean {
+  return input.secondChild && birthDate >= MATERNITY.birth.secondChildFrom;
+}
+
+/** Sinh con: 6 tháng (7 tháng nếu sinh con thứ hai từ 01/07/2026), thêm 1 tháng cho mỗi con từ con thứ hai trong cùng lần sinh. */
+export function birthMonths(input: BirthFacts, birthDate: ISODate): number {
+  const { birth } = MATERNITY;
+  const base = isSecondChildPolicy(input, birthDate) ? birth.secondChildMonths : birth.months;
+  return base + Math.max(0, input.babies - 1) * birth.extraMonthsPerExtraBaby;
 }
 
 /** Ngày kết thúc thời gian hưởng sinh con, tính liên tục từ ngày bắt đầu nghỉ. */
-export function birthEntitledEnd(start: ISODate, babies: number): ISODate {
-  return toISO(addDays(addMonths(parseISO(start), birthMonths(babies)), -1));
+export function birthEntitledEnd(start: ISODate, input: BirthFacts, birthDate: ISODate): ISODate {
+  return toISO(addDays(addMonths(parseISO(start), birthMonths(input, birthDate)), -1));
 }
 
-/** Số ngày làm việc lao động nam được nghỉ khi vợ sinh con (05 – 14 ngày). */
-export function paternityDays(input: Pick<MaternityInput, "wifeBirth" | "wifePreterm">): number {
+/** Số ngày làm việc lao động nam được nghỉ khi vợ sinh con. */
+export function paternityDays(
+  input: Pick<MaternityInput, "wifeBirth" | "wifePreterm" | "babies" | "secondChild">,
+  birthDate: ISODate,
+): number {
   const { paternity } = MATERNITY;
-  if (input.wifeBirth === "twinsCaesarean") return paternity.twinsCaesarean;
-  if (input.wifeBirth === "twins") return paternity.twins;
-  if (input.wifeBirth === "caesarean" || input.wifePreterm) return paternity.caesareanOrPreterm;
-  return paternity.normal;
+  const twins = input.wifeBirth === "twins" || input.wifeBirth === "twinsCaesarean";
+  const extra = twins ? Math.max(0, input.babies - 2) * paternity.extraPerBabyFromThird : 0;
+  let days: number;
+  if (input.wifeBirth === "twinsCaesarean") days = paternity.twinsCaesarean;
+  else if (input.wifeBirth === "twins") days = paternity.twins;
+  else if (input.wifeBirth === "caesarean" || input.wifePreterm) days = paternity.caesareanOrPreterm;
+  else days = paternity.normal;
+  if (isSecondChildPolicy(input, birthDate)) days = Math.max(days, paternity.secondChild);
+  return days + extra;
+}
+
+/** Ngày sinh dùng để xét chính sách: ngày sinh đã nhập, không có thì lấy ngày bắt đầu nghỉ. */
+export function effectiveBirthDate(input: Pick<MaternityInput, "birthDate">, start: ISODate): ISODate {
+  return isISODate(input.birthDate) ? input.birthDate : start;
 }
 
 function withOk(alerts: CalcAlert[], citation: string): CalcAlert[] {
@@ -101,9 +123,15 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
       break;
     }
     case "paternity": {
-      entitled = paternityDays(input);
+      const birthDate = effectiveBirthDate(input, ctx.start);
+      entitled = paternityDays(input, birthDate);
       label = "Nghỉ khi vợ sinh con";
       citation = MATERNITY.citations.paternity;
+      if (isSecondChildPolicy(input, birthDate)) {
+        alerts.push({ level: "info", text: "Áp dụng chính sách vợ sinh con thứ hai từ 01/07/2026: nghỉ 10 ngày làm việc.", citation: MATERNITY.citations.secondChild });
+      } else if (input.secondChild) {
+        alerts.push({ level: "info", text: "Vợ sinh trước 01/07/2026 nên chưa áp dụng chính sách sinh con thứ hai.", citation: MATERNITY.citations.secondChild });
+      }
       break;
     }
   }
@@ -145,9 +173,26 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
 
 function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end: ISODate | null, ctx: PeriodContext): CalcResult {
   const citation = MATERNITY.citations.birth;
-  const months = birthMonths(input.babies);
-  const entitledEnd = birthEntitledEnd(start, input.babies);
+  const birthDate = effectiveBirthDate(input, start);
+  const months = birthMonths(input, birthDate);
+  const entitledEnd = birthEntitledEnd(start, input, birthDate);
   const alerts: CalcAlert[] = [];
+  const citations: string[] = [citation, MATERNITY.citations.rate];
+
+  if (isSecondChildPolicy(input, birthDate)) {
+    alerts.push({ level: "info", text: "Áp dụng chính sách sinh con thứ hai từ 01/07/2026: nghỉ 7 tháng.", citation: MATERNITY.citations.secondChild });
+    citations.push(MATERNITY.citations.secondChild);
+  } else if (input.secondChild) {
+    alerts.push({ level: "info", text: "Sinh trước 01/07/2026 nên chưa áp dụng chính sách sinh con thứ hai (vẫn 6 tháng).", citation: MATERNITY.citations.secondChild });
+  }
+  const earliestStart = toISO(addMonths(parseISO(birthDate), -MATERNITY.birth.maxBeforeBirthMonths));
+  if (start < earliestStart) {
+    alerts.push({
+      level: "warning",
+      text: `Nghỉ trước sinh quá ${MATERNITY.birth.maxBeforeBirthMonths} tháng: sinh ngày ${dmy(birthDate)} thì sớm nhất nghỉ từ ${dmy(earliestStart)}.`,
+      citation,
+    });
+  }
   const shownEnd = end && end >= start ? end : entitledEnd;
 
   if (end && end > entitledEnd) {
@@ -181,6 +226,6 @@ function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end:
     lines,
     total: lines[0].amount,
     alerts: withOk([...period.alerts, ...alerts], citation),
-    citations: [citation, MATERNITY.citations.rate],
+    citations,
   };
 }

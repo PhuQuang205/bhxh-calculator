@@ -33,8 +33,12 @@ export interface MaternityInput {
   visitNo: number;
   /** Sảy thai, phá thai, thai chết lưu: tuổi thai (tuần). */
   gestationWeeks: number;
-  /** Sinh con: số con sinh ra trong lần sinh này. */
+  /** Sinh con / nam nghỉ khi vợ sinh: số con sinh ra trong lần sinh này. */
   babies: number;
+  /** Sinh con thứ hai: tại thời điểm sinh có một con đẻ còn sống (NĐ 168/2026/NĐ-CP). */
+  secondChild: boolean;
+  /** Ngày sinh con (để xét chính sách con thứ hai từ 01/07/2026). Bỏ trống thì lấy ngày bắt đầu nghỉ. */
+  birthDate: ISODate | null;
   /** Nam nghỉ khi vợ sinh: hình thức vợ sinh. */
   wifeBirth: WifeBirthKind;
   /** Nam nghỉ khi vợ sinh: vợ sinh con dưới 32 tuần tuổi. */

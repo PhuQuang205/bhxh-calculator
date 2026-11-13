@@ -2,6 +2,8 @@
  * Mọi con số nghiệp vụ BHXH nằm ở file này.
  * NGUỒN CHUẨN: tài liệu đặc tả của khách hàng "Kế hoạch Thiết kế Web App Tính Chế độ BHXH (...).md",
  * mục 2.1–2.2 (căn cứ Luật BHXH 41/2024/QH15). Chỉ sửa số khi bản đặc tả của khách thay đổi.
+ * Bổ sung đã được khách duyệt (13/11/2026): sinh con thứ hai từ 01/07/2026 theo CV 3923/BHXH-CĐBHXH
+ * ngày 01/07/2026 của BHXH TP Hà Nội (Luật Dân số 113/2025/QH15, Nghị định 168/2026/NĐ-CP).
  */
 import type { ISODate } from "./types";
 
@@ -77,6 +79,11 @@ export const MATERNITY = {
     /** Sinh con: 06 tháng, thêm 01 tháng/con từ con thứ 2 (sinh đôi trở lên). */
     months: 6,
     extraMonthsPerExtraBaby: 1,
+    /** Sinh con thứ hai (có một con đẻ còn sống tại thời điểm sinh), sinh từ 01/07/2026: 07 tháng. */
+    secondChildMonths: 7,
+    secondChildFrom: "2026-07-01",
+    /** Thời gian nghỉ trước khi sinh không quá 02 tháng. */
+    maxBeforeBirthMonths: 2,
   },
   /** Lao động nam nghỉ khi vợ sinh: 05 – 14 ngày làm việc tùy trường hợp. */
   paternity: {
@@ -84,11 +91,17 @@ export const MATERNITY = {
     caesareanOrPreterm: 7,
     twins: 10,
     twinsCaesarean: 14,
+    /** Sinh ba trở lên: từ con thứ ba mỗi con thêm 03 ngày làm việc. */
+    extraPerBabyFromThird: 3,
+    /** Vợ sinh con thứ hai từ 01/07/2026: 10 ngày làm việc. */
+    secondChild: 10,
+    secondChildFrom: "2026-07-01",
   },
   citations: {
     prenatal: `Khám thai, ${LAW}`,
     miscarriage: `Sảy thai, phá thai, thai chết lưu, ${LAW}`,
     birth: `Sinh con, ${LAW}`,
+    secondChild: "Luật Dân số 113/2025/QH15; NĐ 168/2026/NĐ-CP; CV 3923/BHXH-CĐBHXH",
     contraception: `Biện pháp tránh thai, ${LAW}`,
     paternity: `Lao động nam nghỉ khi vợ sinh con, ${LAW}`,
     rate: `Mức hưởng thai sản, ${LAW}`,

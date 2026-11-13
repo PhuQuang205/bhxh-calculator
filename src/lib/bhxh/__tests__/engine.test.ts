@@ -37,6 +37,8 @@ const maternity: MaternityInput = {
   visitNo: 1,
   gestationWeeks: 8,
   babies: 1,
+  secondChild: false,
+  birthDate: null,
   wifeBirth: "normal",
   wifePreterm: false,
   avgSalary: 9_600_000,
@@ -169,20 +171,47 @@ describe("Thai sản", () => {
   });
 
   it("sinh con 6 tháng, sinh đôi thêm 1 tháng", () => {
-    expect(birthMonths(1)).toBe(6);
-    expect(birthMonths(2)).toBe(7);
-    expect(birthEntitledEnd("2026-01-15", 1)).toBe("2026-07-14");
+    const one = { babies: 1, secondChild: false };
+    expect(birthMonths(one, "2026-01-15")).toBe(6);
+    expect(birthMonths({ ...one, babies: 2 }, "2026-01-15")).toBe(7);
+    expect(birthEntitledEnd("2026-01-15", one, "2026-01-15")).toBe("2026-07-14");
     const result = done(calculateMaternity(maternity, ctx("2026-01-15", null)));
     expect(result.benefitMonths).toBe(6);
     expect(result.total).toBe(57_600_000);
   });
 
   it("nam nghỉ khi vợ sinh: 5 / 7 / 10 / 14 ngày làm việc", () => {
-    expect(paternityDays({ wifeBirth: "normal", wifePreterm: false })).toBe(5);
-    expect(paternityDays({ wifeBirth: "normal", wifePreterm: true })).toBe(7);
-    expect(paternityDays({ wifeBirth: "caesarean", wifePreterm: false })).toBe(7);
-    expect(paternityDays({ wifeBirth: "twins", wifePreterm: false })).toBe(10);
-    expect(paternityDays({ wifeBirth: "twinsCaesarean", wifePreterm: false })).toBe(14);
+    const base = { wifePreterm: false, babies: 2, secondChild: false };
+    const d = "2026-03-01";
+    expect(paternityDays({ ...base, wifeBirth: "normal" }, d)).toBe(5);
+    expect(paternityDays({ ...base, wifeBirth: "normal", wifePreterm: true }, d)).toBe(7);
+    expect(paternityDays({ ...base, wifeBirth: "caesarean" }, d)).toBe(7);
+    expect(paternityDays({ ...base, wifeBirth: "twins" }, d)).toBe(10);
+    expect(paternityDays({ ...base, wifeBirth: "twinsCaesarean" }, d)).toBe(14);
+    // Sinh ba: từ con thứ ba thêm 3 ngày
+    expect(paternityDays({ ...base, wifeBirth: "twins", babies: 3 }, d)).toBe(13);
+  });
+
+  it("sinh con thứ hai từ 01/07/2026: 7 tháng", () => {
+    const second = { babies: 1, secondChild: true };
+    expect(birthMonths(second, "2026-06-30")).toBe(6);
+    expect(birthMonths(second, "2026-07-01")).toBe(7);
+    expect(birthMonths({ ...second, babies: 2 }, "2026-07-01")).toBe(8);
+    const result = done(calculateMaternity({ ...maternity, secondChild: true, avgSalary: null }, ctx("2026-09-12", null)));
+    expect(result.benefitMonths).toBe(7);
+    expect(result.deductions[0]).toContain("đến hết 11/04/2027");
+  });
+
+  it("vợ sinh con thứ hai từ 01/07/2026: nam nghỉ 10 ngày làm việc", () => {
+    const base = { wifeBirth: "normal" as const, wifePreterm: false, babies: 1, secondChild: true };
+    expect(paternityDays(base, "2026-06-30")).toBe(5);
+    expect(paternityDays(base, "2026-07-01")).toBe(10);
+    expect(paternityDays({ ...base, wifeBirth: "twinsCaesarean" }, "2026-07-01")).toBe(14);
+  });
+
+  it("cảnh báo nghỉ trước sinh quá 2 tháng", () => {
+    const result = done(calculateMaternity({ ...maternity, birthDate: "2026-09-12" }, ctx("2026-06-01", null)));
+    expect(result.alerts.some((a) => a.level === "warning" && a.text.includes("trước sinh"))).toBe(true);
   });
 });
 
