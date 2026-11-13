@@ -1,8 +1,8 @@
 "use client";
 
 import { FieldSet } from "@/components/form/FieldSet";
+import { OptionSelect } from "@/components/form/OptionSelect";
 import { Stepper } from "@/components/form/Stepper";
-import { RadioCards } from "@/components/ui/radio-cards";
 import { SwitchField } from "@/components/ui/switch";
 import { CONTRIBUTION_LABEL, type ContributionTier } from "@/lib/bhxh/rules";
 import { SICKNESS_KIND_LABEL } from "@/lib/bhxh/sickness";
@@ -27,10 +27,9 @@ export function SicknessKindField({ value, dispatch }: { value: SicknessKind; di
   return (
     <FieldSet id="sickness-kind" label="Phân loại">
       {(labelId) => (
-        <RadioCards
-          aria-labelledby={labelId}
-          columns={1}
-          options={KINDS}
+        <OptionSelect
+          labelledBy={labelId}
+          items={KINDS}
           value={value}
           onValueChange={(kind) => dispatch({ type: "sickness", patch: { kind } })}
         />
@@ -46,10 +45,9 @@ export function SicknessFields({ input, dispatch }: { input: SicknessInput; disp
       {input.kind === "longterm" ? <LongTermDiseaseLookup /> : null}
       <FieldSet id="contribution" label="Thời gian đã đóng BHXH">
         {(labelId) => (
-          <RadioCards
-            aria-labelledby={labelId}
-            columns={3}
-            options={TIERS}
+          <OptionSelect
+            labelledBy={labelId}
+            items={TIERS}
             value={input.contribution}
             onValueChange={(contribution) => set({ contribution })}
           />

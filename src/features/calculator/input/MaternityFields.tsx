@@ -3,9 +3,9 @@
 import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
+import { OptionSelect } from "@/components/form/OptionSelect";
 import { Stepper } from "@/components/form/Stepper";
 import { RadioCards } from "@/components/ui/radio-cards";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SwitchField } from "@/components/ui/switch";
 import { MATERNITY_KIND_LABEL, birthMonths, effectiveBirthDate, miscarriageTier, paternityDays } from "@/lib/bhxh/maternity";
 import { MATERNITY } from "@/lib/bhxh/rules";
@@ -29,27 +29,12 @@ export function MaternityKindField({ value, dispatch }: { value: MaternityKind; 
   return (
     <FieldSet id="maternity-kind" label="Trường hợp">
       {(labelId) => (
-        <Select
+        <OptionSelect
+          labelledBy={labelId}
           items={KINDS}
           value={value}
-          onValueChange={(kind) => {
-            if (kind) dispatch({ type: "maternity", patch: { kind: kind as MaternityKind } });
-          }}
-        >
-          <SelectTrigger
-            aria-labelledby={labelId}
-            className="h-14 w-full rounded-lg border-0 bg-muted pr-3 pl-4 text-base lg:h-14"
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent align="start">
-            {KINDS.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          onValueChange={(kind) => dispatch({ type: "maternity", patch: { kind } })}
+        />
       )}
     </FieldSet>
   );

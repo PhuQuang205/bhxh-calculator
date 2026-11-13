@@ -3,8 +3,8 @@
 import { DateField } from "@/components/form/DateField";
 import { Field } from "@/components/form/Field";
 import { FieldSet } from "@/components/form/FieldSet";
+import { OptionSelect } from "@/components/form/OptionSelect";
 import { Input } from "@/components/ui/input";
-import { RadioCards } from "@/components/ui/radio-cards";
 import { WeekdayPicker } from "@/components/ui/weekday-picker";
 import type { DayRule, ISODate } from "@/lib/bhxh/types";
 
@@ -71,10 +71,9 @@ export function CommonFields({ state, dispatch, rule, holidayDates, entitledEnd 
             label="Lịch nghỉ hằng tuần của đơn vị"
           >
             {(labelId) => (
-              <RadioCards
-                aria-labelledby={labelId}
-                columns={3}
-                options={PRESETS}
+              <OptionSelect
+                labelledBy={labelId}
+                items={PRESETS}
                 value={state.weeklyRestPreset}
                 onValueChange={(preset) =>
                   dispatch({
