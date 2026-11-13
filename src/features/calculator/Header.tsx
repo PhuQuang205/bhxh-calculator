@@ -1,7 +1,5 @@
 "use client";
 
-import { Scale } from "lucide-react";
-
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import type { Mode } from "./state";
@@ -68,10 +66,6 @@ export function Header({ mode, onModeChange, holidayButton }: HeaderProps) {
       </Tabs>
 
       <div className="hidden items-center justify-end gap-2 lg:flex">
-        <span className="inline-flex h-11 items-center gap-2 rounded-full bg-card px-4 text-sm leading-5 font-medium shadow-soft">
-          <Scale aria-hidden className="size-4 text-primary" />
-          Luật BHXH 41/2024/QH15
-        </span>
         {holidayButton}
       </div>
     </header>
