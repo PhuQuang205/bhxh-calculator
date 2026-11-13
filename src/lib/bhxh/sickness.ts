@@ -20,7 +20,7 @@ function annualCap(input: SicknessInput): number {
 }
 
 function capLabel(input: SicknessInput): string {
-  if (input.kind === "longterm") return "Giai đoạn 180 ngày đầu hưởng 75%";
+  if (input.kind === "longterm") return "Giai đoạn 180 ngày đầu";
   return `Trần ốm đau / năm${input.heavyWork ? " (nặng nhọc, độc hại)" : ""}`;
 }
 
