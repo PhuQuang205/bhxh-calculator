@@ -28,9 +28,10 @@ export function addDaysISO(iso: ISODate, amount: number): ISODate {
   return toISO(addDays(toDate(iso), amount));
 }
 
+export const WEEKDAY_NAMES = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"] as const;
+
 export function isWeeklyRest(date: Date, weeklyRest: WeeklyRest): boolean {
-  const day = date.getDay();
-  return day === 0 || (weeklyRest === "sat-sun" && day === 6);
+  return weeklyRest.includes(date.getDay());
 }
 
 interface ClassifyOptions {
@@ -61,7 +62,7 @@ export function classifyDays(start: ISODate, end: ISODate, { rule, weeklyRest, h
     if (holiday) {
       cells.push({ date: iso, included: false, reason: "holiday", label: holiday });
     } else if (isWeeklyRest(date, weeklyRest)) {
-      cells.push({ date: iso, included: false, reason: "weekend", label: date.getDay() === 0 ? "Chủ nhật" : "Thứ bảy" });
+      cells.push({ date: iso, included: false, reason: "weekend", label: WEEKDAY_NAMES[date.getDay()] });
     } else {
       cells.push({ date: iso, included: true });
     }

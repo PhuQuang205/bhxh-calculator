@@ -6,7 +6,7 @@ import { countCalendarDays, isISODate, toISO } from "./dateEngine";
 import type { MaternityInput } from "./inputs";
 import { buildPeriod, periodProblem, type PeriodContext } from "./period";
 import { MATERNITY } from "./rules";
-import type { CalcAlert, CalcOutcome, CapUsage, DayRule, ISODate, MoneyLine } from "./types";
+import { withoutMoney, type CalcAlert, type CalcOutcome, type CalcResult, type CapUsage, type DayRule, type ISODate, type MoneyLine } from "./types";
 
 export const MATERNITY_KIND_LABEL: Record<MaternityInput["kind"], string> = {
   prenatal: "Khám thai",
@@ -60,12 +60,13 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
     const problem = periodProblem(ctx);
     if (problem) missing.push(problem);
   }
-  if (!input.avgSalary) missing.push("Bình quân tiền lương 6 tháng liền kề");
-  if (missing.length > 0 || !ctx.start || !input.avgSalary) return { pending: true, rule, missing };
+  if (missing.length > 0 || !ctx.start) return { pending: true, rule, missing };
 
-  if (input.kind === "birth") return calculateBirth(input, input.avgSalary, ctx.start, ctx.end, ctx);
+  // Lương không bắt buộc: thiếu lương vẫn tính số ngày, chỉ bỏ phần tiền.
+  const avg = input.avgSalary ?? 0;
+  const moneyMissing = input.avgSalary ? null : "Bình quân tiền lương 6 tháng liền kề";
+  if (input.kind === "birth") return withoutMoney(calculateBirth(input, avg, ctx.start, ctx.end, ctx), moneyMissing);
 
-  const avg = input.avgSalary;
   const period = buildPeriod(ctx.start, ctx.end as ISODate, rule, ctx);
   const alerts: CalcAlert[] = [...period.alerts];
   let entitled: number | null;
@@ -127,7 +128,7 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
   const cap: CapUsage | undefined =
     entitled === null ? undefined : { label: `Mức tối đa: ${label.toLowerCase()}`, used: period.counted, limit: entitled, unit: "ngày" };
 
-  return {
+  return withoutMoney({
     rule,
     calendarDays: period.calendarDays,
     benefitDays,
@@ -139,10 +140,10 @@ export function calculateMaternity(input: MaternityInput, ctx: PeriodContext): C
     total: lines.reduce((sum, line) => sum + line.amount, 0),
     alerts: withOk(alerts, citation),
     citations: [citation, MATERNITY.citations.rate],
-  };
+  }, moneyMissing);
 }
 
-function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end: ISODate | null, ctx: PeriodContext): CalcOutcome {
+function calculateBirth(input: MaternityInput, avg: number, start: ISODate, end: ISODate | null, ctx: PeriodContext): CalcResult {
   const citation = MATERNITY.citations.birth;
   const months = birthMonths(input.babies);
   const entitledEnd = birthEntitledEnd(start, input.babies);

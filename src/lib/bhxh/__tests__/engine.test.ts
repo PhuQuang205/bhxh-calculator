@@ -13,7 +13,7 @@ const HOLIDAYS = new Map([
   ["2026-05-01", "Quốc tế Lao động"],
 ]);
 
-function ctx(start: string | null, end: string | null, weeklyRest: PeriodContext["weeklyRest"] = "sun"): PeriodContext {
+function ctx(start: string | null, end: string | null, weeklyRest: PeriodContext["weeklyRest"] = [0]): PeriodContext {
   return { start, end, weeklyRest, holidays: HOLIDAYS };
 }
 
@@ -49,7 +49,7 @@ describe("dateEngine", () => {
   });
 
   it("ngày làm việc trừ Chủ nhật và lễ (lịch nghỉ CN)", () => {
-    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "working", weeklyRest: "sun", holidays: HOLIDAYS });
+    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "working", weeklyRest: [0], holidays: HOLIDAYS });
     expect(cells.filter((c) => c.included)).toHaveLength(9);
     expect(describeExclusions(cells)).toEqual([
       "Trừ Ngày Chiến thắng (30/04)",
@@ -59,12 +59,19 @@ describe("dateEngine", () => {
   });
 
   it("lịch nghỉ T7 + CN trừ thêm Thứ bảy", () => {
-    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "working", weeklyRest: "sat-sun", holidays: HOLIDAYS });
+    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "working", weeklyRest: [6, 0], holidays: HOLIDAYS });
     expect(cells.filter((c) => c.included)).toHaveLength(8);
   });
 
+  it("lịch nghỉ tuần tùy chọn: đơn vị nghỉ Thứ tư", () => {
+    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "working", weeklyRest: [3], holidays: HOLIDAYS });
+    // 12 ngày − 2 Thứ tư (29/04, 06/05) − 2 ngày lễ = 8
+    expect(cells.filter((c) => c.included)).toHaveLength(8);
+    expect(describeExclusions(cells)).toContain("Trừ 2 Thứ tư (29/04, 06/05)");
+  });
+
   it("ngày liên tục tính mọi ngày", () => {
-    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "continuous", weeklyRest: "sat-sun", holidays: HOLIDAYS });
+    const cells = classifyDays("2026-04-27", "2026-05-08", { rule: "continuous", weeklyRest: [6, 0], holidays: HOLIDAYS });
     expect(cells.every((c) => c.included)).toBe(true);
   });
 });
@@ -111,9 +118,23 @@ describe("Ốm đau", () => {
     // 5 ngày × 225.000 + 4 ngày × 300.000 × 50%
     expect(result.total).toBe(1_125_000 + 600_000);
   });
+
+  it("chưa nhập lương vẫn ra số ngày, chỉ bỏ phần tiền", () => {
+    const result = done(calculateSickness({ ...sickness, salary: null }, ctx("2026-04-27", "2026-05-08")));
+    expect(result.benefitDays).toBe(9);
+    expect(result.lines).toHaveLength(0);
+    expect(result.moneyMissing).toBeTruthy();
+  });
 });
 
 describe("Thai sản", () => {
+  it("sinh con chưa nhập lương vẫn ra thời gian hưởng", () => {
+    const result = done(calculateMaternity({ ...maternity, avgSalary: null }, ctx("2026-09-12", null)));
+    expect(result.benefitMonths).toBe(6);
+    expect(result.calendarDays).toBe(181);
+    expect(result.moneyMissing).toBeTruthy();
+  });
+
   it("sảy thai theo mốc tuần tuổi", () => {
     expect(miscarriageTier(4).days).toBe(10);
     expect(miscarriageTier(5).days).toBe(20);

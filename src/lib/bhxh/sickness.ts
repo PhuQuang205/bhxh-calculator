@@ -3,7 +3,7 @@ import { formatDays, formatMoney, formatPercent } from "../format";
 import type { SicknessInput } from "./inputs";
 import { buildPeriod, periodProblem, type PeriodContext } from "./period";
 import { CONTRIBUTION_LABEL, SICKNESS } from "./rules";
-import type { CalcAlert, CalcOutcome, DayRule, MoneyLine } from "./types";
+import { withoutMoney, type CalcAlert, type CalcOutcome, type DayRule, type MoneyLine } from "./types";
 
 export const SICKNESS_KIND_LABEL: Record<SicknessInput["kind"], string> = {
   self: "Bản thân ốm thông thường",
@@ -29,8 +29,9 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
   const missing: string[] = [];
   const problem = periodProblem(ctx);
   if (problem) missing.push(problem);
-  if (!input.salary) missing.push("Tiền lương đóng BHXH tháng liền kề");
-  if (missing.length > 0 || !ctx.start || !ctx.end || !input.salary) return { pending: true, rule, missing };
+  if (missing.length > 0 || !ctx.start || !ctx.end) return { pending: true, rule, missing };
+  // Lương không bắt buộc: thiếu lương vẫn tính số ngày, chỉ bỏ phần tiền.
+  const salary = input.salary ?? 0;
 
   const period = buildPeriod(ctx.start, ctx.end, rule, ctx);
   const alerts: CalcAlert[] = [...period.alerts];
@@ -53,7 +54,7 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
   const benefitDays = remaining - halfDays * 0.5;
   const limit = annualCap(input);
   const used = input.usedDays + benefitDays;
-  const dailyBase = input.salary / SICKNESS.daysPerMonth;
+  const dailyBase = salary / SICKNESS.daysPerMonth;
   const lines: MoneyLine[] = [];
   let paidDays: number;
 
@@ -65,7 +66,7 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
       lines.push({
         label: `Ốm dài ngày, ${formatDays(firstPhase)} ngày đầu (75%)`,
         amount: Math.round(dailyBase * SICKNESS.rate * firstPhase),
-        formula: `(${formatMoney(input.salary)} ÷ 24) × 75% × ${formatDays(firstPhase)} ngày`,
+        formula: `(${formatMoney(salary)} ÷ 24) × 75% × ${formatDays(firstPhase)} ngày`,
       });
     }
     if (secondPhase > 0) {
@@ -73,7 +74,7 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
       lines.push({
         label: `Sau 180 ngày, ${formatDays(secondPhase)} ngày (${formatPercent(rate)})`,
         amount: Math.round(dailyBase * rate * secondPhase),
-        formula: `(${formatMoney(input.salary)} ÷ 24) × ${formatPercent(rate)} × ${formatDays(secondPhase)} ngày`,
+        formula: `(${formatMoney(salary)} ÷ 24) × ${formatPercent(rate)} × ${formatDays(secondPhase)} ngày`,
       });
       alerts.push({
         level: "info",
@@ -86,7 +87,7 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
     lines.push({
       label: `${SICKNESS_KIND_LABEL[input.kind]}, ${formatDays(paidDays)} ngày`,
       amount: Math.round(dailyBase * SICKNESS.rate * paidDays),
-      formula: `(${formatMoney(input.salary)} ÷ 24) × 75% × ${formatDays(paidDays)} ngày`,
+      formula: `(${formatMoney(salary)} ÷ 24) × 75% × ${formatDays(paidDays)} ngày`,
     });
     if (used > limit) {
       alerts.push({
@@ -107,7 +108,7 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
     alerts.unshift({ level: "ok", text: "Đủ điều kiện tính hưởng theo số ngày đã nhập.", citation: SICKNESS.citations.cap });
   }
 
-  return {
+  return withoutMoney({
     rule,
     calendarDays: period.calendarDays,
     benefitDays,
@@ -119,5 +120,5 @@ export function calculateSickness(input: SicknessInput, ctx: PeriodContext): Cal
     total: lines.reduce((sum, line) => sum + line.amount, 0),
     alerts,
     citations: [SICKNESS.citations.cap, SICKNESS.citations.rate],
-  };
+  }, input.salary ? null : "Tiền lương đóng BHXH tháng liền kề");
 }

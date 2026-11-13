@@ -1,8 +1,8 @@
 /** Ngày dạng ISO `yyyy-MM-dd` (ngày lịch, không giờ, không múi giờ). */
 export type ISODate = string;
 
-/** Lịch nghỉ hằng tuần của đơn vị. */
-export type WeeklyRest = "sun" | "sat-sun";
+/** Các thứ nghỉ hằng tuần của đơn vị, theo `Date.getDay()`: 0 = Chủ nhật … 6 = Thứ bảy. */
+export type WeeklyRest = readonly number[];
 
 /** Hai nhóm cách đếm ngày: A = ngày làm việc, B = ngày liên tục. */
 export type DayRule = "working" | "continuous";
@@ -58,6 +58,13 @@ export interface CalcResult {
   total: number;
   alerts: CalcAlert[];
   citations: string[];
+  /** Có giá trị khi chưa nhập lương: chỉ tính số ngày, chưa tính tiền. Ghi tên ô còn thiếu. */
+  moneyMissing?: string;
+}
+
+/** Bỏ phần tiền khi chưa có lương: kết quả số ngày vẫn hiện đầy đủ. */
+export function withoutMoney(result: CalcResult, missing: string | null): CalcResult {
+  return missing ? { ...result, lines: [], total: 0, moneyMissing: missing } : result;
 }
 
 /** Kết quả khi dữ liệu chưa đủ để tính: UI hiện trạng thái rỗng kèm lời nhắc. */
